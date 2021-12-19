@@ -2,6 +2,20 @@ apiVersion: v1
 entries:
   armo-cluster-components:
   - apiVersion: v2
+    appVersion: v1.1.2
+    created: "2021-12-19T08:03:12.698752723Z"
+    description: A Helm chart for ARMO cluster components
+    digest: ae1d53cb7c21b9e68d2c1c1a4ab185e9324c3d9997b7485f61ba9eb5ce4078ce
+    home: https://www.armosec.io/
+    maintainers:
+    - email: ben@armosec.io
+      name: Ben Hirschberg
+    name: armo-cluster-components
+    type: application
+    urls:
+    - https://github.com/armosec/armo-helm/releases/download/armo-cluster-components-1.1.2/armo-cluster-components-1.1.2.tgz
+    version: 1.1.2
+  - apiVersion: v2
     appVersion: v1.1.1
     created: "2021-12-08T15:20:31.62903689Z"
     description: A Helm chart for ARMO cluster components
@@ -71,4 +85,4 @@ entries:
     urls:
     - https://github.com/armosec/armo-helm/releases/download/armo-cluster-components-1.0.2/armo-cluster-components-1.0.2.tgz
     version: 1.0.2
-generated: "2021-12-08T15:20:31.62905649Z"
+generated: "2021-12-19T08:03:12.698780624Z"
