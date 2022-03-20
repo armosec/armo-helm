@@ -70,6 +70,8 @@ spec:
             - name: kubescape-config-volume
               mountPath: /root/.kubescape/config.json
               subPath: config.json
+            securityContext:
+{{- toYaml .Values.global.ContainerSecurityContext | nindent 14}}
           restartPolicy: OnFailure
           serviceAccountName: {{ .Values.global.armoKubescapeServiceAccountName }}
           automountServiceAccountToken: true

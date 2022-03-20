@@ -7,11 +7,11 @@ metadata:
   labels:
     app: {{ .Values.armoKubescape.name }}-post-install-hook
     tier: {{ .Values.global.namespaceTier }}
-  annotations:
+    annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-weight": "0"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded  
-spec:
+    spec:
   template:
     spec:
       containers:
@@ -58,6 +58,8 @@ spec:
         - name: kubescape-config-volume
           mountPath: /root/.kubescape/config.json
           subPath: config.json
+        securityContext:
+{{- toYaml .Values.global.ContainerSecurityContext | nindent 12}}
       restartPolicy: OnFailure
       serviceAccountName: {{ .Values.global.armoKubescapeServiceAccountName }}
       automountServiceAccountToken: true

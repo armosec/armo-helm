@@ -72,6 +72,8 @@ spec:
             - -alsologtostderr
             - -v=4
             - 2>&1
+          securityContext:
+{{- toYaml .Values.global.ContainerSecurityContext | nindent 12}}
       volumes:
         - name: {{ .Values.global.beConfig }}
           configMap:
@@ -79,6 +81,7 @@ spec:
             items:
             - key: "clusterData"
               path: "clusterData.json"
+      serviceAccountName: {{ .Values.global.armoServiceAccountName }}
       automountServiceAccountToken: false
       {{- with .Values.nodeSelector }}
       nodeSelector:

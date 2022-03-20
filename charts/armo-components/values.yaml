@@ -53,6 +53,12 @@ global:
   beConfig: armo-be-config
   armoServiceAccountName: armo-scanner-service-account
   armoKubescapeServiceAccountName: armo-kubescape-service-account
+  armoScanRegistryServiceAccountName: armo-kubescape-service-account
+  defaultServiceAccount: default
+  ContainerSecurityContext: 
+    allowPrivilegeEscalation: false
+    seLinuxOptions:
+      level: "s0:c123,c456"
 
 
 armoScanScheduler:
@@ -79,8 +85,59 @@ armoScanScheduler:
   
   image:
     repository: curlimages/curl
-    tag: latest
+    tag: sha256:faaba66e89c87fd3fb51336857142ee6ce78fa8d8f023a5713d2bf4957f1aca8
     pullPolicy: IfNotPresent
+  
+  resources:
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    requests:
+       cpu: 10m
+       memory: 10Mi
+    limits:
+       cpu: 500m
+       memory: 50Mi
+  
+  ContainerSecurityContext: 
+    allowPrivilegeEscalation: false
+    seLinuxOptions:
+      level: "s0:c123,c456"
+
+  replicaCount: 1
+
+armoScanRegistry:
+
+  ## Schedule Scan using cron
+  ##
+  enabled: true
+
+  ## scan scheduler container name
+  ##
+  name: armo-scan-registry
+  
+  image:
+    repository: curlimages/curl
+    tag: sha256:faaba66e89c87fd3fb51336857142ee6ce78fa8d8f023a5713d2bf4957f1aca8
+    pullPolicy: IfNotPresent
+  
+  resources:
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    requests:
+       cpu: 10m
+       memory: 10Mi
+    limits:
+       cpu: 500m
+       memory: 50Mi
+  
+  ContainerSecurityContext: 
+    allowPrivilegeEscalation: false
+    seLinuxOptions:
+      level: "s0:c123,c456"
 
   replicaCount: 1
 
@@ -109,9 +166,11 @@ armoKubescape:
     # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
     requests:
        cpu: 10m
+       ephemeral-storage: 500Mi
        memory: 100Mi
     limits:
        cpu: 500m
+       ephemeral-storage: 1Gi
        memory: 500Mi
   enableHostScan: true
 
@@ -143,7 +202,7 @@ armoWebsocket:
   image:
     repository: quay.io/armosec/k8s-ca-websocket-ubi
     tag: 448
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
 
   replicaCount: 1
 
@@ -160,9 +219,11 @@ armoWebsocket:
     # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
     requests:
        cpu: 50m
+       ephemeral-storage: 500Mi
        memory: 100Mi
     limits:
        cpu: 100m
+       ephemeral-storage: 1Gi
        memory: 300Mi
 
 
@@ -215,6 +276,11 @@ armoVulnScanner:
 
   labels: {}
 
+  ContainerSecurityContext: 
+    allowPrivilegeEscalation: false
+    seLinuxOptions:
+      level: "s0:c123,c456"
+
 armoCollector:
   enabled: true
 
@@ -225,7 +291,7 @@ armoCollector:
   image:
     repository: quay.io/armosec/k8s-ca-dashboard-aggregator-ubi
     tag: 185
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
 
   replicaCount: 1
   resources:
@@ -235,9 +301,11 @@ armoCollector:
     # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
     requests:
        cpu: 10m
+       ephemeral-storage: 500Mi
        memory: 40Mi
     limits:
        cpu: 500m
+       ephemeral-storage: 1Gi
        memory: 500Mi
 
 
@@ -281,9 +349,11 @@ armoNotificationService:
     # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
     requests:
        cpu: 10m
+       ephemeral-storage: 500Mi
        memory: 10Mi
     limits:
        cpu: 100m
+       ephemeral-storage: 1Gi
        memory: 50Mi
 
 

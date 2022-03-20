@@ -68,6 +68,8 @@ spec:
           args:
             - -include-namespaces={{ .Values.armoNameSpace }}
             - 2>&1
+          securityContext:
+{{- toYaml .Values.global.ContainerSecurityContext | nindent 12}}
       volumes:
         - name: {{ .Values.global.beConfig }}
           configMap:

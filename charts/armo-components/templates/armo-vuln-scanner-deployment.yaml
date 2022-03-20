@@ -68,6 +68,8 @@ spec:
             - name: {{ .Values.global.beConfig }}
               mountPath: /etc/config
               readOnly: true
+          securityContext:
+{{- toYaml .Values.armoVulnScanner.ContainerSecurityContext | nindent 12}}
       volumes:
         - name: {{ .Values.global.beConfig }}
           configMap:

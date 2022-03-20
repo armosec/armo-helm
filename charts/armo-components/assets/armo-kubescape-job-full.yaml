@@ -39,7 +39,7 @@ apiVersion: batch/v1
               subPath: config.json
           restartPolicy: Never
           serviceAccountName: {{ .Values.global.armoKubescapeServiceAccountName }}
-          automountServiceAccountToken: true
+          automountServiceAccountToken: false
           volumes:
           - name: kubescape-config-volume
             configMap:
