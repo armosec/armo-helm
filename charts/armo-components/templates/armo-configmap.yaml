@@ -1,4 +1,3 @@
-{{ template "account_guid" . }}
 {{ template "cluster_name" . }}
 kind: ConfigMap 
 apiVersion: v1 
@@ -40,7 +39,7 @@ data:
       "masterNotificationServer": "wss://{{ .Values.masterNotificationService }}/v1/waitfornotification",
 {{- end }}       
       "portal": "",
-      "customerGUID": "{{ .Values.accountGuid }}",
+      "customerGUID": {{ template "account_guid" $ }},
       "clusterGUID": "",
       "clusterName": "{{ regexReplaceAll "\\W+" .Values.clusterName "-" | lower }}"
     }

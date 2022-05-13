@@ -1,4 +1,3 @@
-{{ template "account_guid" . }}
 {{ template "cluster_name" . }}
 kind: ConfigMap 
 apiVersion: v1 
@@ -10,10 +9,10 @@ metadata:
     tier: {{ .Values.global.namespaceTier }}  
 data:
   clusterName: {{ regexReplaceAll "\\W+" .Values.clusterName "-" | lower  }}  # deprecate
-  customerGUID: {{ .Values.accountGuid }} # deprecate
+  customerGUID: {{ template "account_guid" $ }}
   config.json: |
     {
-      "customerGUID": "{{ .Values.accountGuid }}",
-      "accountID": "{{ .Values.accountGuid }}",
+      "customerGUID": {{ template "account_guid" $ }},
+      "accountID": {{ template "account_guid" $ }},
       "clusterName": "{{ regexReplaceAll "\\W+" .Values.clusterName "-" | lower  }}"
     }
