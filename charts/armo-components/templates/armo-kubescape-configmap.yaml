@@ -15,4 +15,6 @@ data:
       "customerGUID": {{ template "account_guid" $ }},
       "accountID": {{ template "account_guid" $ }},
       "clusterName": "{{ regexReplaceAll "\\W+" .Values.clusterName "-" | lower  }}"
+      "clientID": "{{ .Values.clientID }}",
+      "secretKey": "{{ .Values.secretKey }}"
     }
