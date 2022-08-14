@@ -1,4 +1,4 @@
-{{- if and .Values.armoKubescapeScanScheduler.enabled .Values.armoKubescape.enabled .Values.armoKubescape.submit }}
+{{- if and .Values.armoVulnScanScheduler.enabled .Values.armoKubescape.submit }}
 {{- if .Capabilities.APIVersions.Has "batch/v1/CronJob" }}
 apiVersion: batch/v1
 {{- else }}
@@ -6,14 +6,14 @@ apiVersion: batch/v1beta1
 {{- end }}
 kind: CronJob
 metadata:
-  name: {{ .Values.armoKubescapeScanScheduler.name }}
+  name: {{ .Values.armoVulnScanScheduler.name }}
   namespace: {{ .Values.armoNameSpace }}
   labels:
-    app: {{ .Values.armoKubescapeScanScheduler.name }}
+    app: {{ .Values.armoVulnScanScheduler.name }}
     tier: {{ .Values.global.namespaceTier}}
     armo.tier: "kubescape-scan"
 spec:
-  schedule: "{{ .Values.armoKubescapeScanScheduler.scanSchedule }}"
+  schedule: "{{ .Values.armoVulnScanScheduler.scanSchedule }}"
   jobTemplate:
     spec:
       template:
@@ -22,9 +22,9 @@ spec:
             armo.tier: "kubescape-scan"
         spec:
           containers:
-          - name: {{ .Values.armoKubescapeScanScheduler.name }}
-            image: "{{ .Values.armoKubescapeScanScheduler.image.repository }}:{{ .Values.armoKubescapeScanScheduler.image.tag }}"
-            imagePullPolicy: {{ .Values.armoKubescapeScanScheduler.image.pullPolicy }}
+          - name: {{ .Values.armoVulnScanScheduler.name }}
+            image: "{{ .Values.armoVulnScanScheduler.image.repository }}:{{ .Values.armoVulnScanScheduler.image.tag }}"
+            imagePullPolicy: {{ .Values.armoVulnScanScheduler.image.pullPolicy }}
             args: 
               - -method=post
               - -scheme=http
@@ -33,26 +33,26 @@ spec:
               - -headers="Content-Type:application/json"
               - -path-body=/home/ks/request-body.json
             volumeMounts:
-              - name: {{ .Values.armoKubescapeScanScheduler.name }}
+              - name: {{ .Values.armoVulnScanScheduler.name }}
                 mountPath: /home/ks/request-body.json
                 subPath: request-body.json
                 readOnly: true
 {{- if .Values.volumeMounts }}
 {{ toYaml .Values.volumeMounts | indent 14 }}
 {{- end }}
-{{- if .Values.armoKubescapeScanScheduler.volumeMounts }}
-{{ toYaml .Values.armoKubescapeScanScheduler.volumeMounts | indent 14 }}
+{{- if .Values.armoVulnScanScheduler.volumeMounts }}
+{{ toYaml .Values.armoVulnScanScheduler.volumeMounts | indent 14 }}
 {{- end }}
           restartPolicy: Never
           automountServiceAccountToken: false
           volumes:
-          - name: {{ .Values.armoKubescapeScanScheduler.name }}
+          - name: {{ .Values.armoVulnScanScheduler.name }}
             configMap:
-              name: {{ .Values.armoKubescapeScanScheduler.name }}
+              name: {{ .Values.armoVulnScanScheduler.name }}
 {{- if .Values.volumes }}
 {{ toYaml .Values.volumes | indent 10 }}
 {{- end }}
-{{- if .Values.armoKubescapeScanScheduler.volumes }}
-{{ toYaml .Values.armoKubescapeScanScheduler.volumes | indent 10 }}
+{{- if .Values.armoVulnScanScheduler.volumes }}
+{{ toYaml .Values.armoVulnScanScheduler.volumes | indent 10 }}
 {{- end }}
 {{- end }}

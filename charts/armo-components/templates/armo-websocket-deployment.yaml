@@ -28,6 +28,9 @@ spec:
         helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         tier: {{ .Values.global.namespaceTier}}
         app: {{ .Values.armoWebsocket.name }}
+      {{- if .Values.addRevisionLabel }}
+        helm.sh/revision: "{{ .Release.Revision }}"
+      {{- end }}
     spec:
       {{- if .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -53,10 +56,10 @@ spec:
           resources:
 {{ toYaml .Values.armoWebsocket.resources | indent 12 }}
           env:
-            - name: CA_NAMESPACE
-              value: "{{ .Values.armoNameSpace }}"
-            - name: CA_SYSTEM_MODE
-              value: "{{ .Values.global.armoSystemMode }}"
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
             {{- range .Values.armoWebsocket.env }}
             - name: {{ .name  }}
               value: "{{ .value }}"

@@ -4,29 +4,27 @@
 
 armoNameSpace: armo-system
 appLabel: armo-vuln-scanner
-registrySecretName: armoregcred
 loginSecretName: armo-login
 createKubescapeServiceAccount: true
 
+# -- enable/disable revision label
+addRevisionLabel: true
 
 # ARMO BE URLs
 environment: "prod"
 eventReceiverHttpUrl: "https://report.armo.cloud"
 k8sReportUrl: "wss://report.armo.cloud"
-postmanUrl: "postman.euprod1.cyberarmorsoft.com"
-masterNotificationService: "ens.euprod1.cyberarmorsoft.com"
+gateway: "ens.euprod1.cyberarmorsoft.com"
 backendOpenAPI: "https://api.armosec.io/api"
 # ARMO DEV BE URLs
 devEventReceiverHttpUrl: "https://report.eudev3.cyberarmorsoft.com"
-devPostmanUrl: "postman.eudev3.cyberarmorsoft.com"
 devK8sReportUrl: "wss://report.eudev3.cyberarmorsoft.com"
-devMasterNotificationService: "ens.eudev3.cyberarmorsoft.com"
+devGateway: "ens.eudev3.cyberarmorsoft.com"
 devBackendOpenAPI: "https://api-dev.armosec.io/api"
 # ARMO STAGING BE URLs
 stagingEventReceiverHttpUrl: "https://report-ks.eustage2.cyberarmorsoft.com"
-stagingPostmanUrl: "postman.eustage2.cyberarmorsoft.com"
 stagingK8sReportUrl: "wss://report.eustage2.cyberarmorsoft.com"
-stagingMasterNotificationService: "ens.eustage2.cyberarmorsoft.com"
+stagingGateway: "ens.eustage2.cyberarmorsoft.com" 
 stagingBackendOpenAPI: "https://api-stage.armosec.io/api"
  
 # Customer Specific Data
@@ -69,47 +67,10 @@ volumes: []
 volumeMounts: []
 
 global:
-  armoSystemMode: "SCAN"
   namespaceTier: armo-system-control-plane
   beConfig: armo-be-config
   armoServiceAccountName: armo-scanner-service-account
   armoKubescapeServiceAccountName: armo-kubescape-service-account
-
-# image vulnerability scheduled scan using a CronJob
-armoScanScheduler:
-
-  # -- enable/disable image vulnerability a schedule scan using a CronJob
-  enabled: true
-
-  # scan scheduler container name
-  name: armo-scan-scheduler
-
-          # Frequency of running the scan
-          #     ┌───────────── minute (0 - 59)
-          #     │ ┌───────────── hour (0 - 23)
-          #     │ │ ┌───────────── day of the month (1 - 31)
-          #     │ │ │ ┌───────────── month (1 - 12)
-          #     │ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday;
-          #     │ │ │ │ │                         7 is also Sunday on some systems)
-          #     │ │ │ │ │
-          #     │ │ │ │ │
-          #     * * * * *
-  # -- scan schedule frequency
-  scanSchedule: "0 0 * * *"
-  
-  image:
-    # -- image: curlimages/curl
-    repository: curlimages/curl
-    tag: latest
-    pullPolicy: IfNotPresent
-
-  replicaCount: 1
-
-  # Additional volumes to be mounted on the scan scheduler
-  volumes: []
-
-  # Additional volumeMounts to be mounted on the scan scheduler
-  volumeMounts: []
 
 # kubescape scheduled scan using a CronJob
 armoKubescapeScanScheduler:
@@ -131,12 +92,12 @@ armoKubescapeScanScheduler:
            #     │ │ │ │ │
            #     * * * * *
   # -- scan schedule frequency
-  scanSchedule: "0 0 * * *"
+  scanSchedule: "0 8 * * *"
   
   image:
     # -- source code: https://github.com/armosec/http-request (public repo)
     repository: quay.io/armosec/http_request
-    tag: 	v0.0.6
+    tag: 	v0.0.7
     pullPolicy: IfNotPresent
 
   replicaCount: 1
@@ -158,7 +119,7 @@ armoKubescape:
   image:
     # -- source code: https://github.com/armosec/kubescape/tree/master/httphandler (public repo)
     repository: quay.io/armosec/kubescape
-    tag: v2.0.160
+    tag: v2.0.165
     pullPolicy: Always
 
   resources:
@@ -214,9 +175,9 @@ armoWebsocket:
   name: armo-web-socket
 
   image:
-    # -- source code: https://github.com/armosec/k8s-ca-websocket (private repo)
-    repository: quay.io/armosec/action-trigger
-    tag: v0.0.45
+    # -- source code: https://github.com/kubescape/kontroller
+    repository: quay.io/kubescape/kontroller
+    tag: v0.0.61
     pullPolicy: Always
 
   service:
@@ -266,10 +227,16 @@ armoVulnScanScheduler:
   image:
     # source code - https://github.com/armosec/http-request
     repository: quay.io/armosec/http_request
-    tag: 	v0.0.5
+    tag: 	v0.0.7
     pullPolicy: IfNotPresent
 
   replicaCount: 1
+
+  # Additional volumes to be mounted on the vuln scan scheduler
+  volumes: []
+
+  # Additional volumeMounts to be mounted on the vuln scan scheduler
+  volumeMounts: []
 
 # image vulnerability scanning microservice
 armoVulnScanner:
@@ -284,9 +251,9 @@ armoVulnScanner:
   name: armo-vuln-scan
 
   image:
-    # -- source code: https://github.com/armosec/ca-vuln-scan (private repo)
-    repository: quay.io/armosec/images-vulnerabilities-scan
-    tag: v0.0.19
+    # -- source code: https://github.com/kubescape/kubevuln
+    repository: quay.io/kubescape/kubevuln
+    tag: v0.0.43
     pullPolicy: Always
 
   replicaCount: 1
@@ -332,9 +299,9 @@ armoCollector:
   name: armo-collector
 
   image:
-    # -- source code: https://github.com/armosec/k8s-armo-collector (private repo)
-    repository: quay.io/armosec/cluster-collector
-    tag: v0.0.16
+    # -- source code: https://github.com/kubescape/kollector
+    repository: quay.io/kubescape/kollector
+    tag: v0.0.27
     pullPolicy: Always
 
   replicaCount: 1
@@ -384,9 +351,9 @@ armoNotificationService:
     protocol: TCP
   
   image:
-    # -- source code: https://github.com/armosec/capostman (private repo)
-    repository: quay.io/armosec/notification-server
-    tag: v0.0.5
+    # -- source code: https://github.com/kubescape/gateway
+    repository: quay.io/kubescape/gateway
+    tag: v0.0.14
     pullPolicy: Always
 
   replicaCount: 1
@@ -439,7 +406,7 @@ armoRegistryScanScheduler:
   image:
     # -- source code: https://github.com/armosec/http-request (public repo)
     repository: quay.io/armosec/http_request
-    tag: 	v0.0.6
+    tag: 	v0.0.7
     pullPolicy: IfNotPresent
 
   replicaCount: 1
