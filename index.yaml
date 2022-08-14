@@ -2,6 +2,27 @@ apiVersion: v1
 entries:
   armo-cluster-components:
   - apiVersion: v2
+    appVersion: v1.7.18
+    created: "2022-08-14T14:48:55.969443867Z"
+    description: ARMO Vulnerability Scanning
+    digest: 9929b5d3238b3b85ed16f38d10bde329c3b0bd05f655f7fb8407d026e5928468
+    home: https://www.armosec.io/
+    maintainers:
+    - email: ben@armosec.io
+      name: Ben Hirschberg
+      url: https://www.linkedin.com/in/benyamin-ben-hirschberg-66141890
+    - email: dw@armosec.io
+      name: David Wertenteil
+      url: https://www.linkedin.com/in/david-wertenteil-0ba277b9
+    - email: bez@armosec.io
+      name: Bezalel Brandwine
+      url: https://www.linkedin.com/in/bezalel-brandwine
+    name: armo-cluster-components
+    type: application
+    urls:
+    - https://github.com/armosec/armo-helm/releases/download/armo-cluster-components-1.7.18/armo-cluster-components-1.7.18.tgz
+    version: 1.7.18
+  - apiVersion: v2
     appVersion: v1.7.17
     created: "2022-08-02T07:30:32.772142302Z"
     description: ARMO Vulnerability Scanning
@@ -629,4 +650,4 @@ entries:
     urls:
     - https://github.com/armosec/armo-helm/releases/download/armo-cluster-components-1.0.2/armo-cluster-components-1.0.2.tgz
     version: 1.0.2
-generated: "2022-08-02T07:30:32.772530707Z"
+generated: "2022-08-14T14:48:55.969857969Z"
