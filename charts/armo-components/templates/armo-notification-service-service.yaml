@@ -1,22 +1,22 @@
-{{- if and .Values.armoNotificationService.enabled .Values.armoKubescape.submit }}
+{{- if and .Values.gateway.enabled .Values.kubescape.submit }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.armoNotificationService.name }}
-  namespace: {{ .Values.armoNameSpace }}
+  name: {{ .Values.gateway.name }}
+  namespace: {{ .Values.ksNamespace }}
   labels:
-    app: {{ .Values.armoNotificationService.name }}
+    app: {{ .Values.gateway.name }}
 spec:
-  type: {{ .Values.armoNotificationService.httpService.type }}
+  type: {{ .Values.gateway.httpService.type }}
   ports:
-    - port: {{ .Values.armoNotificationService.websocketService.port }}
-      targetPort: {{ .Values.armoNotificationService.websocketService.targetPort }}
-      protocol: {{ .Values.armoNotificationService.websocketService.protocol }}
+    - port: {{ .Values.gateway.websocketService.port }}
+      targetPort: {{ .Values.gateway.websocketService.targetPort }}
+      protocol: {{ .Values.gateway.websocketService.protocol }}
       name: "websocket"
-    - port: {{ .Values.armoNotificationService.httpService.port }}
-      targetPort: {{ .Values.armoNotificationService.httpService.targetPort }}
-      protocol: {{ .Values.armoNotificationService.httpService.protocol }}
+    - port: {{ .Values.gateway.httpService.port }}
+      targetPort: {{ .Values.gateway.httpService.targetPort }}
+      protocol: {{ .Values.gateway.httpService.protocol }}
       name: "http"
   selector:
-    app: {{ .Values.armoNotificationService.name }}
+    app: {{ .Values.gateway.name }}
 {{- end }}

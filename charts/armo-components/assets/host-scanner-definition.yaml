@@ -56,8 +56,8 @@ spec:
 {{- if .Values.volumeMounts }}
 {{ toYaml .Values.volumeMounts | indent 8 }}
 {{- end }}
-{{- if .Values.armoKubescapeHostScanner.volumeMounts }}
-{{ toYaml .Values.armoKubescapeHostScanner.volumeMounts | indent 8 }}
+{{- if .Values.kubescapeHostScanner.volumeMounts }}
+{{ toYaml .Values.kubescapeHostScanner.volumeMounts | indent 8 }}
 {{- end }}
         readinessProbe:
           httpGet:
@@ -76,8 +76,8 @@ spec:
 {{- if .Values.volumeMounts }}
 {{ toYaml .Values.volumes | indent 6 }}
 {{- end }}
-{{- if .Values.armoKubescapeHostScanner.volumes }}
-{{ toYaml .Values.armoKubescapeHostScanner.volumes | indent 6 }}
+{{- if .Values.kubescapeHostScanner.volumes }}
+{{ toYaml .Values.kubescapeHostScanner.volumes | indent 6 }}
 {{- end }}
       hostNetwork: true
       hostPID: true

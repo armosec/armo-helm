@@ -1,7 +1,7 @@
 {{/* standardize cloud provider */}}
 {{- define "cloud_provider" -}}
-  {{- if .Values.cloud_provider_engine -}}
-    {{- $provider := lower .Values.cloud_provider_engine -}}
+  {{- if .Values.cloudProviderMetadata.cloudProviderEngine -}}
+    {{- $provider := lower .Values.cloudProviderMetadata.cloudProviderEngine -}}
     {{- if or (contains "eks" $provider) (contains "aws" $provider) (contains "amazon" $provider) -}}
 eks
     {{- else if or (contains "gke" $provider) (contains "gcp" $provider) (contains "google" $provider) -}}
@@ -11,16 +11,16 @@ gke
 {{- end }}
 
 {{- define "account_guid" -}}
-  {{- if .Values.armoKubescape.submit }}
-    {{- if .Values.accountGuid -}}
+  {{- if .Values.kubescape.submit }}
+    {{- if .Values.account -}}
     {{- else -}}
-      {{- fail "submitting is enabled but value for accountGuid is not defined: please register at https://cloud.armosec.io to get yours and re-run with  --set accountGuid=<your Guid>" }}
+      {{- fail "submitting is enabled but value for account is not defined: please register at https://cloud.armosec.io to get yours and re-run with  --set account=<your Guid>" }}
     {{- end -}}
   {{- end }}
 {{- end }}
 
 {{- define "cluster_name" -}}
-  {{- if .Values.armoKubescape.submit }}
+  {{- if .Values.kubescape.submit }}
     {{- if .Values.clusterName -}}
     {{- else -}}
       {{- fail "value for clusterName is not defined: re-run with  --set clusterName=<your cluster name>" }}

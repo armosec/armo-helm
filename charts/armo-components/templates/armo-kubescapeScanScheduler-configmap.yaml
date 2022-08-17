@@ -1,11 +1,11 @@
-{{- if and .Values.armoKubescapeScanScheduler.enabled .Values.armoKubescape.enabled .Values.armoKubescape.submit }}
+{{- if and .Values.kubescapeScheduler.enabled .Values.kubescape.enabled .Values.kubescape.submit }}
 kind: ConfigMap 
 apiVersion: v1 
 metadata:
-  name: {{ .Values.armoKubescapeScanScheduler.name }}
-  namespace: {{ .Values.armoNameSpace }}
+  name: {{ .Values.kubescapeScheduler.name }}
+  namespace: {{ .Values.ksNamespace }}
   labels:
-    app: {{ .Values.armoKubescapeScanScheduler.name }}
+    app: {{ .Values.kubescapeScheduler.name }}
     tier: {{ .Values.global.namespaceTier }}
 data:
   request-body.json: |-

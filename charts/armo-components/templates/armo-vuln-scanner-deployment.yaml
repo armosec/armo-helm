@@ -1,16 +1,16 @@
-{{- if and .Values.armoVulnScanner.enabled .Values.armoKubescape.submit }}
+{{- if and .Values.kubevuln.enabled .Values.kubescape.submit }}
 {{ template "account_guid" . }}
 {{ template "cluster_name" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.armoVulnScanner.name }}
-  namespace: {{ .Values.armoNameSpace }}
+  name: {{ .Values.kubevuln.name }}
+  namespace: {{ .Values.ksNamespace }}
   labels:
-    app: {{ .Values.armoVulnScanner.name }}
+    app: {{ .Values.kubevuln.name }}
     tier: {{ .Values.global.namespaceTier}}
 spec:
-  replicas: {{ .Values.armoVulnScanner.replicaCount }}
+  replicas: {{ .Values.kubevuln.replicaCount }}
   revisionHistoryLimit: 2
   strategy:
     rollingUpdate:
@@ -19,29 +19,29 @@ spec:
     type: RollingUpdate
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ .Values.armoVulnScanner.name }}
+      app.kubernetes.io/name: {{ .Values.kubevuln.name }}
       app.kubernetes.io/instance: {{ .Release.Name }}
       tier: {{ .Values.global.namespaceTier}}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ .Values.armoVulnScanner.name }}
+        app.kubernetes.io/name: {{ .Values.kubevuln.name }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         tier: {{ .Values.global.namespaceTier}}
-        app: {{ .Values.armoVulnScanner.name }}
+        app: {{ .Values.kubevuln.name }}
       {{- if .Values.addRevisionLabel }}
         helm.sh/revision: "{{ .Release.Revision }}"
       {{- end }}
     spec:
-      {{- if .Values.imagePullSecrets }}
-      imagePullSecrets:
-      - name: {{ toYaml .Values.imagePullSecrets }}
-      {{- end }}
       containers:
-        - name: {{ .Values.armoVulnScanner.name }}
-          image: "{{ .Values.armoVulnScanner.image.repository }}:{{ .Values.armoVulnScanner.image.tag }}"
-          imagePullPolicy: {{ .Values.armoVulnScanner.image.pullPolicy }}
+        - name: {{ .Values.kubevuln.name }}
+          image: "{{ .Values.kubevuln.image.repository }}:{{ .Values.kubevuln.image.tag }}"
+          imagePullPolicy: {{ .Values.kubevuln.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
           ports:
           - name: "vuln-scan-port"
             containerPort: 8080
@@ -54,11 +54,11 @@ spec:
               path: /v1/readiness
               port: readiness-port
           resources:
-{{ toYaml .Values.armoVulnScanner.resources | indent 12 }}
+{{ toYaml .Values.kubevuln.resources | indent 12 }}
           env:
             - name: PRINT_POST_JSON
-              value: "{{ .Values.armoVulnScanner.verbose }}"
-            {{- range .Values.armoVulnScanner.env }}
+              value: "{{ .Values.kubevuln.verbose }}"
+            {{- range .Values.kubevuln.env }}
             - name: {{ .name  }}
               value: "{{ .value }}"
             {{- end }}
@@ -67,35 +67,35 @@ spec:
             - -v=4
             - 2>&1
           volumeMounts:
-            - name: {{ .Values.global.beConfig }}
+            - name: {{ .Values.global.cloudConfig }}
               mountPath: /etc/config
               readOnly: true
 {{- if .Values.volumeMounts }}
 {{ toYaml .Values.volumeMounts | indent 12 }}
 {{- end }}
-{{- if .Values.armoVulnScanner.volumeMounts }}
-{{ toYaml .Values.armoVulnScanner.volumeMounts | indent 12 }}
+{{- if .Values.kubevuln.volumeMounts }}
+{{ toYaml .Values.kubevuln.volumeMounts | indent 12 }}
 {{- end }}
       volumes:
-        - name: {{ .Values.global.beConfig }}
+        - name: {{ .Values.global.cloudConfig }}
           configMap:
-            name: {{ .Values.global.beConfig }}
+            name: {{ .Values.global.cloudConfig }}
             items:
             - key: "clusterData"
               path: "clusterData.json"
 {{- if .Values.volumes }}
 {{ toYaml .Values.volumes | indent 8 }}
 {{- end }}
-{{- if .Values.armoVulnScanner.volumes }}
-{{ toYaml .Values.armoVulnScanner.volumes | indent 8 }}
+{{- if .Values.kubevuln.volumes }}
+{{ toYaml .Values.kubevuln.volumes | indent 8 }}
 {{- end }}
-      serviceAccountName: {{ .Values.global.armoServiceAccountName }}
+      serviceAccountName: {{ .Values.global.kontrollerServiceAccountName }}
       automountServiceAccountToken: true
-      {{- with .Values.armoVulnScanner.nodeSelector }}
+      {{- with .Values.kubevuln.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.armoVulnScanner.affinity }}
+      {{- with .Values.kubevuln.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}

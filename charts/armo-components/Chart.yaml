@@ -1,7 +1,7 @@
 apiVersion: v2
-name: armo-cluster-components
+name: kubescape-cluster-solution
 description:
-  ARMO Vulnerability Scanning
+  Kubescape is an E2E Kubernetes cluster security platform 
  
 type: application
 

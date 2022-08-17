@@ -1,4 +1,4 @@
-{{- if and .Values.armoCollector.enabled .Values.armoKubescape.submit }}
+{{- if and .Values.kollector.enabled .Values.kubescape.submit }}
 {{ template "account_guid" . }}
 {{ template "cluster_name" . }}
 apiVersion: apps/v1
@@ -6,54 +6,39 @@ apiVersion: apps/v1
 # parallel reporting will cause Kubescape SaaS to miss identify the cluster liveness status
 kind: StatefulSet
 metadata:
-  name: {{ .Values.armoCollector.name }}
-  namespace: {{ .Values.armoNameSpace }}
+  name: {{ .Values.kollector.name }}
+  namespace: {{ .Values.ksNamespace }}
   labels:
-    app: {{ .Values.armoCollector.name }}
+    app: {{ .Values.kollector.name }}
     tier: {{ .Values.global.namespaceTier}}
 spec:
   serviceName: ""
-  replicas: {{ .Values.armoCollector.replicaCount }}
+  replicas: {{ .Values.kollector.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ .Values.armoCollector.name }}
+      app.kubernetes.io/name: {{ .Values.kollector.name }}
       app.kubernetes.io/instance: {{ .Release.Name }}
       tier: {{ .Values.global.namespaceTier}}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ .Values.armoCollector.name }}
+        app.kubernetes.io/name: {{ .Values.kollector.name }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         tier: {{ .Values.global.namespaceTier}}
-        app: {{ .Values.armoCollector.name }}
+        app: {{ .Values.kollector.name }}
         helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
       {{- if .Values.addRevisionLabel }}
         helm.sh/revision: "{{ .Release.Revision }}"
       {{- end }}
     spec:
-      {{- if .Values.imagePullSecrets }}
-      imagePullSecrets:
-      - name: {{ toYaml .Values.imagePullSecrets }}
-      {{- end }}
-      initContainers:
-      - image: quay.io/armosec/kubectl:1.24 # https://github.com/armosec/bitnami-docker-kubectl
-        name: remove-old-deployments
-        command: 
-        - bash
-        args:
-        - -c
-        - set -xv; kubectl delete deployment armo-collector -n armo-system; dep_exist=$?; echo $dep_exist; while [ $dep_exist -eq 0 ]; do kubectl get deployment armo-collector -n armo-system; dep_exist=$?; echo $dep_exist; done 
-        resources:
-          limits:
-            cpu: 20m
-            memory: 100Mi
-          requests:
-            cpu: 10m
-            memory: 40Mi
       containers:
-        - name: {{ .Values.armoCollector.name }}
-          image: "{{ .Values.armoCollector.image.repository }}:{{ .Values.armoCollector.image.tag }}"
-          imagePullPolicy: {{ .Values.armoCollector.image.pullPolicy }}
+        - name: {{ .Values.kollector.name }}
+          image: "{{ .Values.kollector.image.repository }}:{{ .Values.kollector.image.tag }}"
+          imagePullPolicy: {{ .Values.kollector.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
           ports:
             - name: "readiness-port"
               containerPort: 8000
@@ -65,7 +50,7 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 5
           resources:
-{{ toYaml .Values.armoCollector.resources | indent 12 }}
+{{ toYaml .Values.kollector.resources | indent 12 }}
           env:
             - name: ACTIVATE_CVE_SCAN_ON_NEW_IMAGE_FEATURE
               value: "{{ .Values.triggerNewImageScan }}"
@@ -73,7 +58,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-            {{- range .Values.armoCollector.env }}
+            {{- range .Values.kollector.env }}
             - name: {{ .name  }}
               value: "{{ .value }}"
             {{- end }}
@@ -82,35 +67,35 @@ spec:
           - -v=4
           - 2>&1
           volumeMounts:
-            - name: {{ .Values.global.beConfig }}
+            - name: {{ .Values.global.cloudConfig }}
               mountPath: /etc/config
               readOnly: true
 {{- if .Values.volumeMounts }}
 {{ toYaml .Values.volumeMounts | indent 12 }}
 {{- end }}
-{{- if .Values.armoCollector.volumeMounts }}
-{{ toYaml .Values.armoCollector.volumeMounts | indent 12 }}
+{{- if .Values.kollector.volumeMounts }}
+{{ toYaml .Values.kollector.volumeMounts | indent 12 }}
 {{- end }}
       volumes:
-        - name: {{ .Values.global.beConfig }}
+        - name: {{ .Values.global.cloudConfig }}
           configMap:
-            name: {{ .Values.global.beConfig }}
+            name: {{ .Values.global.cloudConfig }}
             items:
             - key: "clusterData"
               path: "clusterData.json"
 {{- if .Values.volumes }}
 {{ toYaml .Values.volumes | indent 8 }}
 {{- end }}
-{{- if .Values.armoCollector.volumes }}
-{{ toYaml .Values.armoCollector.volumes | indent 8 }}
+{{- if .Values.kollector.volumes }}
+{{ toYaml .Values.kollector.volumes | indent 8 }}
 {{- end }}
-      serviceAccountName: {{ .Values.global.armoServiceAccountName }}
+      serviceAccountName: {{ .Values.global.kontrollerServiceAccountName }}
       automountServiceAccountToken: true
-      {{- with .Values.armoCollector.nodeSelector }}
+      {{- with .Values.kollector.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.armoCollector.affinity }}
+      {{- with .Values.kollector.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}

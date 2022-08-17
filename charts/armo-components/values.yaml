@@ -1,35 +1,35 @@
-# Default values for armo operator.
+# Default values for KS chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-armoNameSpace: armo-system
-appLabel: armo-vuln-scanner
-loginSecretName: armo-login
-createKubescapeServiceAccount: true
+ksNamespace: kubescape
+ksLabel: kubescape
+createKubescapeServiceAccount: true # TODO: move to kubescape
 
 # -- enable/disable revision label
 addRevisionLabel: true
 
-# ARMO BE URLs
+# KS cloud BE URLs
 environment: "prod"
 eventReceiverHttpUrl: "https://report.armo.cloud"
 k8sReportUrl: "wss://report.armo.cloud"
-gateway: "ens.euprod1.cyberarmorsoft.com"
+gatewayUrl: "ens.euprod1.cyberarmorsoft.com"
 backendOpenAPI: "https://api.armosec.io/api"
-# ARMO DEV BE URLs
+# KS cloud DEV BE URLs
 devEventReceiverHttpUrl: "https://report.eudev3.cyberarmorsoft.com"
 devK8sReportUrl: "wss://report.eudev3.cyberarmorsoft.com"
-devGateway: "ens.eudev3.cyberarmorsoft.com"
+devGatewayUrl: "ens.eudev3.cyberarmorsoft.com"
 devBackendOpenAPI: "https://api-dev.armosec.io/api"
-# ARMO STAGING BE URLs
+# KS cloud STAGING BE URLs
 stagingEventReceiverHttpUrl: "https://report-ks.eustage2.cyberarmorsoft.com"
 stagingK8sReportUrl: "wss://report.eustage2.cyberarmorsoft.com"
-stagingGateway: "ens.eustage2.cyberarmorsoft.com" 
+stagingGatewayUrl: "ens.eustage2.cyberarmorsoft.com" 
 stagingBackendOpenAPI: "https://api-stage.armosec.io/api"
  
 # Customer Specific Data
-# accountGuid is deliberately not defined here and it should be defined by the user
-# clusterName: "" // cluster name must be defined by the user
+# account is deliberately not defined here and it should be defined by the user
+clusterName: "cluster" # cluster name must be defined by the user
+account: "1234" # cluster name must be defined by the user
 
 # -- client ID - https://hub.armosec.io/docs/authentication
 clientID: ""
@@ -39,23 +39,22 @@ secretKey: ""
 
 # cloud support
 
-# -- cloud provider engine
-cloud_provider_engine:
+cloudProviderMetadata:
 
-# -- cloud region
-cloudRegion:
+  # -- cloud provider engine
+  cloudProviderEngine:
 
-# -- AWS IAM arn role
-aws_iam_role_arn:
+  # -- cloud region
+  cloudRegion:
 
-# -- GKE service account
-gke_service_account:
+  # -- AWS IAM arn role
+  awsIamRoleArn:
 
-# -- GKE project
-gkeProject:
+  # -- GKE service account
+  gkeServiceAccount:
 
-nameOverride: ""
-fullnameOverride: ""
+  # -- GKE project
+  gkeProject:
 
 # -- enable/disable trigger image scan for new images
 triggerNewImageScan: false  
@@ -67,19 +66,19 @@ volumes: []
 volumeMounts: []
 
 global:
-  namespaceTier: armo-system-control-plane
-  beConfig: armo-be-config
-  armoServiceAccountName: armo-scanner-service-account
-  armoKubescapeServiceAccountName: armo-kubescape-service-account
+  namespaceTier: ks-control-plane
+  cloudConfig: ks-cloud-config
+  kontrollerServiceAccountName: ks-sa # TODO - split service account to the different components
+  kubescapeServiceAccountName: kubescape-sa # TODO - split service account to the different components
 
 # kubescape scheduled scan using a CronJob
-armoKubescapeScanScheduler:
+kubescapeScheduler: 
 
   # -- enable/disable a kubescape scheduled scan using a CronJob
   enabled: true
 
   # scan scheduler container name
-  name: armo-kubescape-scheduler
+  name: kubescape-scheduler
 
            # -- Frequency of running the scan
            #     ┌───────────── minute (0 - 59)
@@ -109,16 +108,16 @@ armoKubescapeScanScheduler:
   volumeMounts: []
 
 # kubescape scanner - https://github.com/armosec/kubescape
-armoKubescape:
+kubescape:
 
   # -- enable/disable kubescape scanning
   enabled: true
 
-  name: armo-kubescape
+  name: kubescape
 
   image:
-    # -- source code: https://github.com/armosec/kubescape/tree/master/httphandler (public repo)
-    repository: quay.io/armosec/kubescape
+    # -- source code: https://github.com/kubescape/kubescape/tree/master/httphandler (public repo)
+    repository: quay.io/kubescape/kubescape
     tag: v2.0.165
     pullPolicy: Always
 
@@ -139,7 +138,7 @@ armoKubescape:
   # -- skip check for a newer version 
   skipUpdateCheck: false
 
-  # -- submit results to ARMO SaaS: https://cloud.armosec.io/
+  # -- submit results to the Kubescape cloud: https://cloud.armosec.io/
   submit: true
 
   replicaCount: 1
@@ -154,7 +153,7 @@ armoKubescape:
     # -- enable/disable service monitor for prometheus (operator) integration
     enabled: false
 
-    # If needed the service monitor can be deployed to a different namespace than the one armoKubescape is in
+    # If needed the service monitor can be deployed to a different namespace than the one kubescape is in
     #namespace: my-namespace
 
   # Additional volumes to be mounted on Kubescape
@@ -163,16 +162,16 @@ armoKubescape:
   # Additional volumeMounts to be mounted on Kubescape
   volumeMounts: []
 
-# armoWebsocket will trigger kubescape and image vulnerability scanning
-armoWebsocket:
+# Kontroller will trigger kubescape and kubevuln scanning
+kontroller:
 
-  # -- enable/disable kubescape and image vulnerability scanning
+  # -- enable/disable Kontroller
   enabled: true
 
   replicaCount: 1
 
-  # armo websocket container name
-  name: armo-web-socket
+  # kontroller Deployment name
+  name: kontroller
 
   image:
     # -- source code: https://github.com/kubescape/kontroller
@@ -202,15 +201,13 @@ armoWebsocket:
   # Additional volumeMounts to be mounted on the websocket
   volumeMounts: []
 
-armoVulnScanScheduler:
+kubevulnScheduler:
 
   ## Schedule Scan using cron
-  ##
   enabled: true
 
   ## scan scheduler container name
-  ##
-  name: armo-vulnscan-scheduler
+  name: kubevuln-scheduler
 
            # -- Frequency of running the scan
            #     ┌───────────── minute (0 - 59)
@@ -238,17 +235,17 @@ armoVulnScanScheduler:
   # Additional volumeMounts to be mounted on the vuln scan scheduler
   volumeMounts: []
 
-# image vulnerability scanning microservice
-armoVulnScanner:
+# kubevuln - image vulnerability scanning microservice
+kubevuln:
 
-  # -- for enable:"<any-value>", for disable:"": the print of json posted to the backend from the vuln scanner 
+  # -- for enable:"<any-value>", for disable:"": the print of json posted to the Kubescape cloud from the vuln scanner 
   verbose: ""
 
-  # -- enable/disable image vulnerability scanning
+  # -- enable/disable kubevuln
   enabled: true
 
-  # armo websocket container name
-  name: armo-vuln-scan
+  # kubevuln Deployment name
+  name: kubevuln
 
   image:
     # -- source code: https://github.com/kubescape/kubevuln
@@ -278,7 +275,7 @@ armoVulnScanner:
        ephemeral-storage: 50Gi
 
   env:
-  - name: CA_MAX_VULN_SCAN_ROUTINS
+  - name: CA_MAX_VULN_SCAN_ROUTINES # TODO update the kubevuln
     value: "1"
 
   labels: {}
@@ -289,14 +286,14 @@ armoVulnScanner:
   # Additional volumeMounts to be mounted on the vulnerability scanning microservice
   volumeMounts: []
 
-# armoCollector will collect the data only in the armo-system namespace and report the data to the ARMO SaaS. This is to enable onDemand scanning and for creating/editing/deleting scheduled scans from the ARMO SaaS
-armoCollector:
+# kollector will collect the data only in the kubescape namespace and report the data to the Kubescape cloud. This is to enable onDemand scanning and for creating/editing/deleting scheduled scans from the Kubescape cloud
+kollector:
 
-  # -- enable/disable the armoCollector
+  # -- enable/disable the kollector
   enabled: true
 
-  # armo collector container name
-  name: armo-collector
+  # kollector SS name
+  name: kollector
 
   image:
     # -- source code: https://github.com/kubescape/kollector
@@ -329,14 +326,14 @@ armoCollector:
   # Additional volumeMounts to be mounted on the collector
   volumeMounts: []
 
-# armoNotificationService pass notifications from ARMO SaaS to the armo-web-socket microservice. The notifications are the onDemand scanning and the scanning schedule settings
-armoNotificationService:
+# gateway pass notifications from Kubescape cloud to the Kontroller microservice. The notifications are the onDemand scanning and the scanning schedule settings
+gateway:
 
-  # -- enable/disable passing notifications from ARMO SaaS to the armo-web-socket microservice. The notifications are the onDemand scanning and the scanning schedule settings
+  # -- enable/disable passing notifications from Kubescape cloud to the Kontroller microservice. The notifications are the onDemand scanning and the scanning schedule settings
   enabled: true
 
-  # armo notification-service container name
-  name: armo-notification-service
+  # gateway Deployment name
+  name: gateway
 
   websocketService:
     type: ClusterIP
@@ -374,7 +371,7 @@ armoNotificationService:
   # Additional volumeMounts to be mounted on the notification-service
   volumeMounts: []
 
-armoKubescapeHostScanner:
+kubescapeHostScanner:
   # Additional volumes to be mounted on the Kubescape host scanner
   volumes: []
 
@@ -382,13 +379,13 @@ armoKubescapeHostScanner:
   volumeMounts: []
 
 # registry scan scheduled scan using a CronJob
-armoRegistryScanScheduler:
+registryScanScheduler:
 
   # -- enable/disable a kubescape scheduled scan using a CronJob
   enabled: true
 
   # scan scheduler container name
-  name: armo-registry-scheduler
+  name: registry-scheduler
 
            # -- Frequency of running the scan
            #     ┌───────────── minute (0 - 59)

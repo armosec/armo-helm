@@ -1,15 +1,15 @@
-{{- if and .Values.armoNotificationService.enabled .Values.armoKubescape.submit }}
+{{- if and .Values.gateway.enabled .Values.kubescape.submit }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.armoNotificationService.name }}
-  namespace: {{ .Values.armoNameSpace }}
+  name: {{ .Values.gateway.name }}
+  namespace: {{ .Values.ksNamespace }}
   labels:
-    app: {{ .Values.armoNotificationService.name }}
+    app: {{ .Values.gateway.name }}
     tier: {{ .Values.global.namespaceTier}}
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
 spec:
-  replicas: {{ .Values.armoNotificationService.replicaCount }}
+  replicas: {{ .Values.gateway.replicaCount }}
   revisionHistoryLimit: 2
   strategy:
     rollingUpdate:
@@ -18,44 +18,44 @@ spec:
     type: RollingUpdate
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ .Values.armoNotificationService.name }}
+      app.kubernetes.io/name: {{ .Values.gateway.name }}
       app.kubernetes.io/instance: {{ .Release.Name }}
       tier: {{ .Values.global.namespaceTier}}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ .Values.armoNotificationService.name }}
+        app.kubernetes.io/name: {{ .Values.gateway.name }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         tier: {{ .Values.global.namespaceTier}}
-        app: {{ .Values.armoNotificationService.name }}
+        app: {{ .Values.gateway.name }}
       {{- if .Values.addRevisionLabel }}
         helm.sh/revision: "{{ .Release.Revision }}"
       {{- end }}
     spec:
-      {{- if .Values.imagePullSecrets }}
-      imagePullSecrets:
-      - name: {{ toYaml .Values.imagePullSecrets }}
-      {{- end }}
       containers:
-        - name: {{ .Values.armoNotificationService.name }}
-          image: "{{ .Values.armoNotificationService.image.repository }}:{{ .Values.armoNotificationService.image.tag }}"
-          imagePullPolicy: {{ .Values.armoNotificationService.image.pullPolicy }}
+        - name: {{ .Values.gateway.name }}
+          image: "{{ .Values.gateway.image.repository }}:{{ .Values.gateway.image.tag }}"
+          imagePullPolicy: {{ .Values.gateway.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
           ports:
             - name: "websocket"
-              containerPort: {{ .Values.armoNotificationService.websocketService.port }}
+              containerPort: {{ .Values.gateway.websocketService.port }}
               protocol: TCP
             - name: "rest-api"
-              containerPort: {{ .Values.armoNotificationService.httpService.port }}
+              containerPort: {{ .Values.gateway.httpService.port }}
               protocol: TCP
           resources:
-{{ toYaml .Values.armoNotificationService.resources | indent 12 }}
+{{ toYaml .Values.gateway.resources | indent 12 }}
           env:  
             - name: WEBSOCKET_PORT
-              value: "{{ .Values.armoNotificationService.websocketService.port }}"
+              value: "{{ .Values.gateway.websocketService.port }}"
             - name: HTTP_PORT
-              value: "{{ .Values.armoNotificationService.httpService.port }}"            
-            {{- range .Values.armoNotificationService.env }}
+              value: "{{ .Values.gateway.httpService.port }}"            
+            {{- range .Values.gateway.env }}
             - name: {{ .name  }}
               value: "{{ .value }}"
             {{- end }}
@@ -64,34 +64,34 @@ spec:
             - -v=4
             - 2>&1
           volumeMounts:
-          - name: {{ .Values.global.beConfig }}
+          - name: {{ .Values.global.cloudConfig }}
             mountPath: /etc/config
             readOnly: true
 {{- if .Values.volumeMounts }}
 {{ toYaml .Values.volumeMounts | indent 10 }}
 {{- end }}
-{{- if .Values.armoNotificationService.volumeMounts }}
-{{ toYaml .Values.armoNotificationService.volumeMounts | indent 10 }}
+{{- if .Values.gateway.volumeMounts }}
+{{ toYaml .Values.gateway.volumeMounts | indent 10 }}
 {{- end }}
       volumes:
-        - name: {{ .Values.global.beConfig }}
+        - name: {{ .Values.global.cloudConfig }}
           configMap:
-            name: {{ .Values.global.beConfig }}
+            name: {{ .Values.global.cloudConfig }}
             items:
             - key: "clusterData"
               path: "clusterData.json"
 {{- if .Values.volumes }}
 {{ toYaml .Values.volumes | indent 8 }}
 {{- end }}
-{{- if .Values.armoNotificationService.volumes }}
-{{ toYaml .Values.armoNotificationService.volumes | indent 8 }}
+{{- if .Values.gateway.volumes }}
+{{ toYaml .Values.gateway.volumes | indent 8 }}
 {{- end }}
       automountServiceAccountToken: false
-      {{- with .Values.armoNotificationService.nodeSelector }}
+      {{- with .Values.gateway.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.armoNotificationService.affinity }}
+      {{- with .Values.gateway.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}

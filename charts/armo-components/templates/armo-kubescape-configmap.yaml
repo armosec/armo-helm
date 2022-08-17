@@ -1,18 +1,18 @@
-{{- if .Values.armoKubescape.enabled  }}
+{{- if .Values.kubescape.enabled  }}
 {{ template "account_guid" . }}
 {{ template "cluster_name" . }}
 kind: ConfigMap 
 apiVersion: v1 
 metadata:
-  name: {{ .Values.armoKubescape.name }}-config
-  namespace: {{ .Values.armoNameSpace }}
+  name: {{ .Values.kubescape.name }}-config
+  namespace: {{ .Values.ksNamespace }}
   labels:
-    app: {{ .Values.armoKubescape.name }}-config
+    app: {{ .Values.kubescape.name }}-config
     tier: {{ .Values.global.namespaceTier }}  
 data:
   config.json: |
     {
-      "accountID": "{{ .Values.accountGuid }}",
+      "accountID": "{{ .Values.account }}",
       "clusterName": "{{ regexReplaceAll "\\W+" .Values.clusterName "-" | lower  }}",
       "clientID": "{{ .Values.clientID }}",
       "secretKey": "{{ .Values.secretKey }}"

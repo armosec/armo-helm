@@ -1,16 +1,16 @@
-{{- if .Values.armoKubescape.enabled  }}
+{{- if .Values.kubescape.enabled  }}
 {{- $cloud_provider := (include "cloud_provider" .) -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.armoKubescape.name }}
-  namespace: {{ .Values.armoNameSpace }}
+  name: {{ .Values.kubescape.name }}
+  namespace: {{ .Values.ksNamespace }}
   labels:
-    app: {{ .Values.armoKubescape.name }}
+    app: {{ .Values.kubescape.name }}
     tier: {{ .Values.global.namespaceTier }}
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
 spec:
-  replicas: {{ .Values.armoKubescape.replicaCount }}
+  replicas: {{ .Values.kubescape.replicaCount }}
   revisionHistoryLimit: 2
   strategy:
     rollingUpdate:
@@ -19,25 +19,29 @@ spec:
     type: RollingUpdate
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ .Values.armoKubescape.name }}
+      app.kubernetes.io/name: {{ .Values.kubescape.name }}
       app.kubernetes.io/instance: {{ .Release.Name }}
       tier: {{ .Values.global.namespaceTier}}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ .Values.armoKubescape.name }}
+        app.kubernetes.io/name: {{ .Values.kubescape.name }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
         tier: {{ .Values.global.namespaceTier}}
-        app: {{ .Values.armoKubescape.name }}
+        app: {{ .Values.kubescape.name }}
       {{- if .Values.addRevisionLabel }}
         helm.sh/revision: "{{ .Release.Revision }}"
       {{- end }}
     spec:
       containers:
       - name: kubescape
-        image: "{{ .Values.armoKubescape.image.repository }}:{{ .Values.armoKubescape.image.tag }}"
-        imagePullPolicy: "{{ .Values.armoKubescape.image.pullPolicy }}"
+        image: "{{ .Values.kubescape.image.repository }}:{{ .Values.kubescape.image.tag }}"
+        imagePullPolicy: "{{ .Values.kubescape.image.pullPolicy }}"
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
         ports:
           - name: http
             containerPort: 8080
@@ -56,19 +60,19 @@ spec:
           periodSeconds: 3
         env:
         - name: KS_DOWNLOAD_ARTIFACTS  # When set to true the artifacts will be downloaded every scan execution
-          value: "{{ .Values.armoKubescape.downloadArtifacts }}" 
+          value: "{{ .Values.kubescape.downloadArtifacts }}" 
         - name: KS_DEFAULT_CONFIGMAP_NAME
-          value: "{{ .Values.armoKubescape.name }}-config"
+          value: "{{ .Values.kubescape.name }}-config"
         - name: KS_DEFAULT_CONFIGMAP_NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
         - name: KS_ENABLE_HOST_SCANNER
-          value: "{{ .Values.armoKubescape.enableHostScan }}"
+          value: "{{ .Values.kubescape.enableHostScan }}"
         - name: KS_SUBMIT
-          value: "{{ .Values.armoKubescape.submit }}"
+          value: "{{ .Values.kubescape.submit }}"
         - name: KS_SKIP_UPDATE_CHECK
-          value: "{{ .Values.armoKubescape.skipUpdateCheck }}"
+          value: "{{ .Values.kubescape.skipUpdateCheck }}"
         - name: KS_SAAS_ENV
         {{ if eq .Values.environment "dev" }}
           value: "dev"
@@ -81,18 +85,18 @@ spec:
         - name: KS_CLOUD_PROVIDER
           value: "{{ $cloud_provider }}"
         - name: KS_CLOUD_REGION
-          value: "{{ .Values.cloudRegion }}"
+          value: "{{ .Values.cloudProviderMetadata.cloudRegion }}"
         - name: KS_KUBE_CLUSTER
           value: "{{ .Values.clusterName }}"
         {{- if eq "gke" $cloud_provider }}
         - name: KS_GKE_PROJECT
-          value: "{{ .Values.gkeProject }}"
+          value: "{{ .Values.cloudProviderMetadata.gkeProject }}"
         {{- end -}}
         {{- end }}
         command:
         - ksserver
         resources:
-{{ toYaml .Values.armoKubescape.resources | indent 14 }}            
+{{ toYaml .Values.kubescape.resources | indent 14 }}            
         volumeMounts:
         - name: kubescape-config-volume
           mountPath: /home/ks/.kubescape/config.json
@@ -103,29 +107,29 @@ spec:
 {{- if .Values.volumeMounts }}
 {{ toYaml .Values.volumeMounts | indent 8 }}
 {{- end }}
-{{- if .Values.armoKubescape.volumeMounts }}
-{{ toYaml .Values.armoKubescape.volumeMounts | indent 8 }}
+{{- if .Values.kubescape.volumeMounts }}
+{{ toYaml .Values.kubescape.volumeMounts | indent 8 }}
 {{- end }}
-      serviceAccountName: {{ .Values.global.armoKubescapeServiceAccountName }}
+      serviceAccountName: {{ .Values.global.kubescapeServiceAccountName }}
       automountServiceAccountToken: true
       volumes:
       - name: kubescape-config-volume
         configMap:
-          name: {{ .Values.armoKubescape.name }}-config
+          name: {{ .Values.kubescape.name }}-config
       - name: host-scanner-definition
         configMap:
           name: host-scanner-definition
 {{- if .Values.volumes }}
 {{ toYaml .Values.volumes | indent 6 }}
 {{- end }}
-{{- if .Values.armoKubescape.volumes }}
-{{ toYaml .Values.armoKubescape.volumes | indent 6 }}
+{{- if .Values.kubescape.volumes }}
+{{ toYaml .Values.kubescape.volumes | indent 6 }}
 {{- end }}
-      {{- with .Values.armoKubescape.nodeSelector }}
+      {{- with .Values.kubescape.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8}}
       {{- end }}
-      {{- with .Values.armoKubescape.affinity }}
+      {{- with .Values.kubescape.affinity }}
       affinity:
         {{- toYaml . | nindent 8}}
       {{- end }}

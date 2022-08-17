@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: {{ .Values.armoNameSpace }}
+  namespace: {{ .Values.ksNamespace }}
   labels:
-    app: {{ .Values.global.beConfig }}
+    app: {{ .Values.global.cloudConfig }}
     tier: {{ .Values.global.namespaceTier }}
   name: registry-scan-cronjob-template
 data:
