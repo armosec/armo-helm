@@ -21,6 +21,10 @@ spec:
           labels:
             armo.tier: "kubescape-scan"
         spec:
+          {{- if .Values.imagePullSecrets }}
+          imagePullSecrets:
+          - name: {{ toYaml .Values.imagePullSecrets }}
+          {{- end }}
           containers:
           - name: {{ .Values.kubescapeScheduler.name }}
             image: "{{ .Values.kubescapeScheduler.image.repository }}:{{ .Values.kubescapeScheduler.image.tag }}"

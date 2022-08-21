@@ -28,8 +28,7 @@ stagingBackendOpenAPI: "https://api-stage.armosec.io/api"
  
 # Customer Specific Data
 # account is deliberately not defined here and it should be defined by the user
-clusterName: "cluster" # cluster name must be defined by the user
-account: "1234" # cluster name must be defined by the user
+clusterName: # cluster name must be defined by the user
 
 # -- client ID - https://hub.armosec.io/docs/authentication
 clientID: ""
@@ -37,8 +36,10 @@ clientID: ""
 # -- secret key - https://hub.armosec.io/docs/authentication
 secretKey: ""
 
-# cloud support
+# -- set the image pull secrets for private registry support 
+imagePullSecrets: ""
 
+# cloud support
 cloudProviderMetadata:
 
   # -- cloud provider engine
@@ -117,7 +118,7 @@ kubescape:
 
   image:
     # -- source code: https://github.com/kubescape/kubescape/tree/master/httphandler (public repo)
-    repository: quay.io/kubescape/kubescape
+    repository: quay.io/armosec/kubescape
     tag: v2.0.165
     pullPolicy: Always
 

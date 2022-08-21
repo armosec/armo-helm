@@ -31,18 +31,28 @@ spec:
         helm.sh/revision: "{{ .Release.Revision }}"
       {{- end }}
     spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ toYaml .Values.imagePullSecrets }}
+      {{- end }}
       containers:
         - name: {{ .Values.kollector.name }}
           image: "{{ .Values.kollector.image.repository }}:{{ .Values.kollector.image.tag }}"
           imagePullPolicy: {{ .Values.kollector.image.pullPolicy }}
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
             runAsNonRoot: true
+            runAsUser: 100
           ports:
             - name: "readiness-port"
               containerPort: 8000
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /v1/liveness
+              port: readiness-port
+            initialDelaySeconds: 3
+            periodSeconds: 3
           readinessProbe:
             httpGet:
               path: /v1/readiness

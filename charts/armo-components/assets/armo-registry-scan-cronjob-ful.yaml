@@ -16,6 +16,10 @@ apiVersion: batch/v1
               labels:
                 armo.tier: "registry-scan"
             spec:
+              {{- if .Values.imagePullSecrets }}
+              imagePullSecrets:
+              - name: {{ toYaml .Values.imagePullSecrets }}
+              {{- end }}
               containers:
               - name: {{ .Values.registryScanScheduler.name }}
                 image: "{{ .Values.registryScanScheduler.image.repository }}:{{ .Values.registryScanScheduler.image.tag }}"
@@ -24,6 +28,7 @@ apiVersion: batch/v1
                   allowPrivilegeEscalation: false
                   readOnlyRootFilesystem: true
                   runAsNonRoot: true
+                  runAsUser: 100
                 args: 
                   - -method=post
                   - -scheme=http

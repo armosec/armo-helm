@@ -25,6 +25,10 @@ spec:
       labels:
         name: host-scanner
     spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ toYaml .Values.imagePullSecrets }}
+      {{- end }}
       tolerations:
       # this toleration is to have the DaemonDet runnable on master nodes
       # remove it if your masters can't run pods

@@ -34,14 +34,18 @@ spec:
         helm.sh/revision: "{{ .Release.Revision }}"
       {{- end }}
     spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ toYaml .Values.imagePullSecrets }}
+      {{- end }}
       containers:
       - name: kubescape
         image: "{{ .Values.kubescape.image.repository }}:{{ .Values.kubescape.image.tag }}"
         imagePullPolicy: "{{ .Values.kubescape.image.pullPolicy }}"
         securityContext:
           allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
           runAsNonRoot: true
+          runAsUser: 100
         ports:
           - name: http
             containerPort: 8080
