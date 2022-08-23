@@ -101,8 +101,6 @@ helm upgrade --install armo  armo/armo-cluster-components -n armo-system --creat
 | volumeMounts | object | `[]` | Additional volumeMounts for all containers |
 
 
-
-
 # In-cluster components overview
 
 An overview of each in-cluster component which is part of the Kubescpae platform helm chart.
