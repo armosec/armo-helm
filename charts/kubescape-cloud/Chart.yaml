@@ -1,5 +1,5 @@
 apiVersion: v2
-name: kubescape-cluster-solution
+name: kubescape-cloud
 description:
   Kubescape is an E2E Kubernetes cluster security platform 
  

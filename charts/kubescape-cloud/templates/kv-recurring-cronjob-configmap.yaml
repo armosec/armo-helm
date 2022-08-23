@@ -1,7 +1,7 @@
 kind: ConfigMap 
 apiVersion: v1 
 metadata:
-  name: vulnscan-cronjob-template # TODO: update template name
+  name: kubevuln-cronjob-template # TODO: update template name
   namespace: {{ .Values.ksNamespace }}
   labels:
     app: {{ .Values.global.cloudConfig }}

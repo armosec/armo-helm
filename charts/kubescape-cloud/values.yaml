@@ -177,7 +177,7 @@ kontroller:
   image:
     # -- source code: https://github.com/kubescape/kontroller
     repository: quay.io/kubescape/kontroller
-    tag: v0.0.61
+    tag: v0.0.63
     pullPolicy: Always
 
   service:
