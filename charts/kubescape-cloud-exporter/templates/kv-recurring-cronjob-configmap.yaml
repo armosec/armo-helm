@@ -8,4 +8,4 @@ metadata:
     tier: {{ .Values.global.namespaceTier }}
 data:
   cronjobTemplate: |-
-    {{ tpl (.Files.Get "assets/armo-vulnscan-cronjob-full.yaml") . }}
+    {{ tpl (.Files.Get "assets/kubevuln-cronjob-full.yaml") . }}
