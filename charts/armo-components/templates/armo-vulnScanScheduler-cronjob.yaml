@@ -25,7 +25,9 @@ spec:
           - name: {{ .Values.armoVulnScanScheduler.name }}
             image: "{{ .Values.armoVulnScanScheduler.image.repository }}:{{ .Values.armoVulnScanScheduler.image.tag }}"
             imagePullPolicy: {{ .Values.armoVulnScanScheduler.image.pullPolicy }}
-            args: 
+            resources:
+{{ toYaml .Values.armoVulnScanScheduler.resources | indent 14 }}
+            args:
               - -method=post
               - -scheme=http
               - -host={{ .Values.armoWebsocket.name }}:{{ .Values.armoWebsocket.service.port }}
