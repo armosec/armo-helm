@@ -1,3 +1,4 @@
+{{- if and .Values.armoVulnScanner.enabled .Values.armoKubescape.submit }}
 kind: ConfigMap 
 apiVersion: v1 
 metadata:
@@ -9,3 +10,4 @@ metadata:
 data:
   cronjobTemplate: |-
     {{ tpl (.Files.Get "assets/armo-vulnscan-cronjob-full.yaml") . }}
+{{- end }}
