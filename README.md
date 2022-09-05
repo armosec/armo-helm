@@ -200,7 +200,7 @@ subgraph Cluster 1
 
 * __Resource Kind:__ `Deployment`
 * __Communication:__ REST API, Websocket
-* __Responsibility:__ The Kontroller component is at the heart of the solution as it is the triggering engine for the different actions in the cluster; It responds to REST API requests and messages received over websocket connection, and triggers the relevant action in the cluster. Such actions could be triggering a configuration scan, image vulnerability scan, defining a recurring scan (by creating CronJobs), etc.
+* __Responsibility:__ The Kontroller component is at the heart of the solution as it is the triggering engine for the different actions in the cluster, It responds to REST API requests and messages received over websocket connection, and triggers the relevant action in the cluster. Such actions could be triggering a configuration scan, image vulnerability scan, defining a recurring scan (by creating CronJobs), etc.
 
 <details><summary>Component Diagram</summary>
 
@@ -292,7 +292,7 @@ class urlCm,recurringScanCm,kontroller,er,gateway,masterGateway,recurringScanCj,
 
 * __Resource Kind:__ `Deployment`
 * __Communication:__ REST API
-* __Responsibility:__ Runs [Kubescape](https://github.com/armosec/kubescape) for detecting misconfigurations in the cluster; This is microservice uses the same engine as the Kubescape CLI tool.
+* __Responsibility:__ Runs [Kubescape](https://github.com/armosec/kubescape) for detecting misconfigurations in the cluster, This microservice uses the same engine as the Kubescape CLI tool.
 
 <details><summary>Component Diagram</summary>
 
