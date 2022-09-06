@@ -33,6 +33,38 @@ helm upgrade --install armo  armo/armo-cluster-components -n armo-system --creat
 > Add `--set clientID=<generated client id> --set secretKey=<generated secret key>` if you have [generated an auth key](https://hub.armosec.io/docs/authentication)
 
 > Add `--set armoKubescape.serviceMonitor.enabled=true` for installing the Prometheus service monitor, [read more about Prometheus integration](https://hub.armosec.io/docs/prometheus-exporter)
+
+### Adjusting Resource Usage for Your Cluster
+
+By default, Kubescape is configured for small- to medium-sized clusters.
+If you have a larger cluster and you experience slowdowns or see Kubernetes evicting components, please revise the amount of resources allocated for the troubled component.
+
+Taking Kubescape for example, we found that our defaults of 500 MiB of memory and 500m CPU work well for clusters up to 1250 total resources.
+If you have more total resources or experience resource pressure already, first check out how many resources are in your cluster by running the following command:
+
+```
+kubectl get all -A --no-headers | wc -l
+```
+
+The command should print an approximate count of resources in your cluster.
+Then, based on the number you see, allocate 100 MiB of memory for every 200 resources in your cluster over the count of 1250, but no less than 128 MiB total.
+The formula for memory is as follows:
+```
+MemoryLimit := max(128, 0.4 * YOUR_AMOUNT_OF_RESOURCES)
+```
+
+For example, if your your cluster has 500 resources, a sensible memory limit would be:
+```
+armoKubescape:
+  resources:
+    limits:
+      memory: 200Mi  # max(128, 0.4 * 500) == 200
+```
+If your cluster has 50 resources, we still recommend allocating at least 128 MiB of memory.
+
+When it comes to CPU, the more you allocate, the faster Kubescape will scan your cluster.
+This is especially true for clusters that have a large amount of resources.
+However, we recomend that you give Kubescape no less than 500m CPU no matter the size of your cluster so it can scan a relatively large amount of resources fast ;)
  
 ## Chart support
 
