@@ -1,14 +1,15 @@
-# Kubescape Operator
+# ARMO cluster components
+ARMO Vulnerability Scanning
 
-![Version: 1.7.18](https://img.shields.io/badge/Version-1.7.18-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.7.18](https://img.shields.io/badge/AppVersion-v1.7.18-informational?style=flat-square)
+![Version: 1.7.17](https://img.shields.io/badge/Version-1.7.17-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.7.17](https://img.shields.io/badge/AppVersion-v1.7.17-informational?style=flat-square)
 
 ## [Docs](https://hub.armosec.io/docs/installation-of-armo-in-cluster)
 
-## Installing Kubescape Operator in a Kubernetes cluster using Helm:
+## Installing ARMO cluster components in a Kubernetes cluster Using Helm:
 
-1. Add the Kubescape Helm Repo
+1. Add the Vulnerability Scanning Helm Repo
 ```
-helm repo add kubescape https://kubescape.github.io/helm-charts/
+helm repo add armo https://armosec.github.io/armo-helm/
 ```
 
 2. Update helm repo
@@ -26,12 +27,12 @@ Otherwise, get the account ID from the [kubescape SaaS](https://hub.armosec.io/d
 
 Run the install command:
 ```
-helm upgrade --install kubescape  kubescape/kubescape-cloud -n kubescape --create-namespace --set account=<my_account_ID> --set clusterName=`kubectl config current-context` 
+helm upgrade --install armo  armo/armo-cluster-components -n armo-system --create-namespace --set accountGuid=<my_account_guid> --set clusterName=`kubectl config current-context` 
 ```
 
 > Add `--set clientID=<generated client id> --set secretKey=<generated secret key>` if you have [generated an auth key](https://hub.armosec.io/docs/authentication)
 
-> Add `--set kubescape.serviceMonitor.enabled=true` for installing the Prometheus service monitor, [read more about Prometheus integration](https://hub.armosec.io/docs/prometheus-exporter)
+> Add `--set armoKubescape.serviceMonitor.enabled=true` for installing the Prometheus service monitor, [read more about Prometheus integration](https://hub.armosec.io/docs/prometheus-exporter)
  
 ## Chart support
 
@@ -39,61 +40,61 @@ helm upgrade --install kubescape  kubescape/kubescape-cloud -n kubescape --creat
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| kollector.affinity | object | `{}` | Assign custom [affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) rules to the StatefulSet |
-| kollector.enabled | bool | `true` | enable/disable the kollector |
-| kollector.env[0] | object | `{"name":"PRINT_REPORT","value":"false"}` | print in verbose mode (print all reported data) |
-| kollector.image.repository | string | `"quay.io/kubescape/kollector"` | [source code](https://github.com/kubescape/kollector) |
-| kollector.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) |
-| kollector.volumes | object | `[]` | Additional volumes for the collector |
-| kollector.volumeMounts | object | `[]` | Additional volumeMounts for the collector |
-| kubescape.affinity | object | `{}` | Assign custom [affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) rules to the deployment |
-| kubescape.downloadArtifacts | bool | `true` | download policies every scan, we recommend it should remain true, you should change to 'false' when running in an air-gapped environment or when scanning with high frequency (when running with Prometheus) |
-| kubescape.enableHostScan | bool | `true` | enable [host scanner feature](https://hub.armosec.io/docs/host-sensor) |
-| kubescape.enabled | bool | `true` | enable/disable kubescape scanning |
-| kubescape.image.repository | string | `"quay.io/kubescape/kubescape"` | [source code](https://github.com/kubescape/kubescape/tree/master/httphandler) (public repo) |
-| kubescape.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) |
-| kubescape.serviceMonitor.enabled | bool | `false` | enable/disable service monitor for prometheus (operator) integration |
-| kubescape.skipUpdateCheck | bool | `false` | skip check for a newer version  |
-| kubescape.submit | bool | `true` | submit results to Kubescape SaaS: https://cloud.armosec.io/ |
-| kubescape.volumes | object | `[]` | Additional volumes for Kubescape |
-| kubescape.volumeMounts | object | `[]` | Additional volumeMounts for Kubescape |
-| kubescapeScheduler.enabled | bool | `true` | enable/disable a kubescape scheduled scan using a CronJob |
-| kubescapeScheduler.image.repository | string | `"quay.io/kubescape/http_request"` | [source code](https://github.com/kubescape/http-request) (public repo) |
-| kubescapeScheduler.scanSchedule | string | `"0 0 * * *"` | scan schedule frequency |
-| kubescapeScheduler.volumes | object | `[]` | Additional volumes for scan scheduler |
-| kubescapeScheduler.volumeMounts | object | `[]` | Additional volumeMounts for scan scheduler |
-| gateway.affinity | object | `{}` | Assign custom [affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) rules to the deployment |
-| gateway.enabled | bool | `true` | enable/disable passing notifications from Kubescape SaaS to the Operator microservice. The notifications are the onDemand scanning and the scanning schedule settings |
-| gateway.image.repository | string | `"quay.io/kubescape/gateway"` | [source code](https://github.com/kubescape/gateway) |
-| gateway.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) |
-| gateway.volumes | object | `[]` | Additional volumes for the notification service |
-| gateway.volumeMounts | object | `[]` | Additional volumeMounts for the notification service |
-| kubevuln.affinity | object | `{}` | Assign custom [affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) rules to the deployment |
-| kubevuln.enabled | bool | `true` | enable/disable image vulnerability scanning |
-| kubevuln.image.repository | string | `"quay.io/kubescape/kubevuln"` | [source code](https://github.com/kubescape/kubevuln) |
-| kubevuln.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) |
-| kubevuln.volumes | object | `[]` | Additional volumes for the image vulnerability scanning |
-| kubevuln.volumeMounts | object | `[]` | Additional volumeMounts for the image vulnerability scanning |
-| kubevulnScheduler.enabled | bool | `true` | enable/disable a image vulnerability scheduled scan using a CronJob |
-| kubevulnScheduler.image.repository | string | `"quay.io/kubescape/http_request"` | [source code](https://github.com/kubescape/http-request) (public repo) |
-| kubevulnScheduler.scanSchedule | string | `"0 0 * * *"` | scan schedule frequency |
-| kubevulnScheduler.volumes | object | `[]` | Additional volumes for scan scheduler |
-| kubevulnScheduler.volumeMounts | object | `[]` | Additional volumeMounts for scan scheduler |
-| operator.affinity | object | `{}` | Assign custom [affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) rules to the deployment |
-| operator.enabled | bool | `true` | enable/disable kubescape and image vulnerability scanning |
-| operator.image.repository | string | `"quay.io/kubescape/operator"` | [source code](https://github.com/kubescape/operator) |
-| operator.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) |
-| operator.volumes | object | `[]` | Additional volumes for the web socket |
-| operator.volumeMounts | object | `[]` | Additional volumeMounts for the web socket |
-| kubescapeHostScanner.volumes | object | `[]` | Additional volumes for the host scanner |
-| kubescapeHostScanner.volumeMounts | object | `[]` | Additional volumeMounts for the host scanner |
-| awsIamRoleArn | string | `nil` | AWS IAM arn role |
+| armoCollector.affinity | object | `{}` | Assign custom [affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) rules to the StatefulSet |
+| armoCollector.enabled | bool | `true` | enable/disable the armoCollector |
+| armoCollector.env[0] | object | `{"name":"PRINT_REPORT","value":"false"}` | print in verbose mode (print all reported data) |
+| armoCollector.image.repository | string | `"quay.io/kubescape/kollector"` | [source code](https://github.com/kubescape/kollector) |
+| armoCollector.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) |
+| armoCollector.volumes | object | `[]` | Additional volumes for the collector |
+| armoCollector.volumeMounts | object | `[]` | Additional volumeMounts for the collector |
+| armoKubescape.affinity | object | `{}` | Assign custom [affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) rules to the deployment |
+| armoKubescape.downloadArtifacts | bool | `true` | download policies every scan, we recommend it should remain true, you should change to 'false' when running in an air-gapped environment or when scanning with high frequency (when running with Prometheus) |
+| armoKubescape.enableHostScan | bool | `true` | enable [host scanner feature](https://hub.armosec.io/docs/host-sensor) |
+| armoKubescape.enabled | bool | `true` | enable/disable kubescape scanning |
+| armoKubescape.image.repository | string | `"quay.io/armosec/kubescape"` | [source code](https://github.com/armosec/kubescape/tree/master/httphandler) (public repo) |
+| armoKubescape.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) |
+| armoKubescape.serviceMonitor.enabled | bool | `false` | enable/disable service monitor for prometheus (operator) integration |
+| armoKubescape.skipUpdateCheck | bool | `false` | skip check for a newer version  |
+| armoKubescape.submit | bool | `true` | submit results to ARMO SaaS: https://cloud.armosec.io/ |
+| armoKubescape.volumes | object | `[]` | Additional volumes for Kubescape |
+| armoKubescape.volumeMounts | object | `[]` | Additional volumeMounts for Kubescape |
+| armoKubescapeScanScheduler.enabled | bool | `true` | enable/disable a kubescape scheduled scan using a CronJob |
+| armoKubescapeScanScheduler.image.repository | string | `"quay.io/armosec/http_request"` | [source code](https://github.com/armosec/http-request) (public repo) |
+| armoKubescapeScanScheduler.scanSchedule | string | `"0 0 * * *"` | scan schedule frequency |
+| armoKubescapeScanScheduler.volumes | object | `[]` | Additional volumes for scan scheduler |
+| armoKubescapeScanScheduler.volumeMounts | object | `[]` | Additional volumeMounts for scan scheduler |
+| armoNotificationService.affinity | object | `{}` | Assign custom [affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) rules to the deployment |
+| armoNotificationService.enabled | bool | `true` | enable/disable passing notifications from ARMO SaaS to the armo-web-socket microservice. The notifications are the onDemand scanning and the scanning schedule settings |
+| armoNotificationService.image.repository | string | `"quay.io/kubescape/gateway"` | [source code](https://github.com/kubescape/gateway) |
+| armoNotificationService.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) |
+| armoNotificationService.volumes | object | `[]` | Additional volumes for the notification service |
+| armoNotificationService.volumeMounts | object | `[]` | Additional volumeMounts for the notification service |
+| armoVulnScanner.affinity | object | `{}` | Assign custom [affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) rules to the deployment |
+| armoVulnScanner.enabled | bool | `true` | enable/disable image vulnerability scanning |
+| armoVulnScanner.image.repository | string | `"quay.io/kubescape/kubevuln"` | [source code](https://github.com/kubescape/kubevuln) |
+| armoVulnScanner.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) |
+| armoVulnScanner.volumes | object | `[]` | Additional volumes for the image vulnerability scanning |
+| armoVulnScanner.volumeMounts | object | `[]` | Additional volumeMounts for the image vulnerability scanning |
+| armoVulnScanScheduler.enabled | bool | `true` | enable/disable a image vulnerability scheduled scan using a CronJob |
+| armoVulnScanScheduler.image.repository | string | `"quay.io/armosec/http_request"` | [source code](https://github.com/armosec/http-request) (public repo) |
+| armoVulnScanScheduler.scanSchedule | string | `"0 0 * * *"` | scan schedule frequency |
+| armoVulnScanScheduler.volumes | object | `[]` | Additional volumes for scan scheduler |
+| armoVulnScanScheduler.volumeMounts | object | `[]` | Additional volumeMounts for scan scheduler |
+| armoWebsocket.affinity | object | `{}` | Assign custom [affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) rules to the deployment |
+| armoWebsocket.enabled | bool | `true` | enable/disable kubescape and image vulnerability scanning |
+| armoWebsocket.image.repository | string | `"quay.io/kubescape/kontroller"` | [source code](https://github.com/kubescape/kontroller) |
+| armoWebsocket.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) |
+| armoWebsocket.volumes | object | `[]` | Additional volumes for the web socket |
+| armoWebsocket.volumeMounts | object | `[]` | Additional volumeMounts for the web socket |
+| armoKubescapeHostScanner.volumes | object | `[]` | Additional volumes for the host scanner |
+| armoKubescapeHostScanner.volumeMounts | object | `[]` | Additional volumeMounts for the host scanner |
+| aws_iam_role_arn | string | `nil` | AWS IAM arn role |
 | clientID | string | `""` | client ID, [read more](https://hub.armosec.io/docs/authentication) |
 | addRevisionLabel | bool | `true` | Add revision label to the components. This will insure the components will restart when updating the helm |
 | cloudRegion | string | `nil` | cloud region |
-| cloudProviderEngine | string | `nil` | cloud provider engine |
+| cloud_provider_engine | string | `nil` | cloud provider engine |
 | gkeProject | string | `nil` | GKE project |
-| gkeServiceAccount | string | `nil` | GKE service account |
+| gke_service_account | string | `nil` | GKE service account |
 | secretKey | string | `""` | secret key, [read more](https://hub.armosec.io/docs/authentication) |
 | triggerNewImageScan | bool | `false` | enable/disable trigger image scan for new images |
 | volumes | object | `[]` | Additional volumes for all containers |
@@ -117,14 +118,14 @@ graph TB
 
   subgraph Cluster
     gw(Gateway)
-    operator(Operator)
+    kontroller(Kontroller)
     k8sApi(Kubernetes API);
     kubevuln(Kubevuln)
     ks(Kubescape)
-    gw --- operator
-    operator -->|scan cluster| ks
-    operator -->|scan images| kubevuln
-    operator --> k8sApi
+    gw --- kontroller
+    kontroller -->|scan cluster| ks
+    kontroller -->|scan images| kubevuln
+    kontroller --> k8sApi
     ks --> k8sApi
   end;
   
@@ -138,7 +139,7 @@ subgraph Backend
   classDef k8s fill:#326ce5,stroke:#fff,stroke-width:1px,color:#fff;
   classDef plain fill:#ddd,stroke:#fff,stroke-width:1px,color:#000;
   class k8sApi k8s
-  class ks,operator,gw,masterGw,kollector,kubevuln,er,dashboard plain
+  class ks,kontroller,gw,masterGw,kollector,kubevuln,er,dashboard plain
 ```
 
 ---
@@ -165,41 +166,41 @@ graph TB
   end
    subgraph Cluster N
     gw3("Gateway (In-cluster)")
-    operator3(Operator)
+    kontroller3(Kontroller)
   end;
   subgraph Cluster 2
     gw2("Gateway (In-cluster)")
-    operator2(Operator)
+    kontroller2(Kontroller)
   end;
    
 subgraph Cluster 1
     gw1("Gateway (In-cluster)")
-    operator1(Operator)
+    kontroller1(Kontroller)
   end;
   dashboard --> masterGw
    masterGw .- gw2
    masterGw .- gw3
-       gw1 .- operator1
-    gw2 .- operator2
-    gw3 .- operator3
+       gw1 .- kontroller1
+    gw2 .- kontroller2
+    gw3 .- kontroller3
    masterGw .- gw1
 
     
   classDef k8s fill:#326ce5,stroke:#fff,stroke-width:1px,color:#fff;
   classDef plain fill:#ddd,stroke:#fff,stroke-width:1px,color:#000;
   class k8sApi k8s
-  class ks,operator1,dashboard,operator2,operator3 plain
+  class ks,kontroller1,dashboard,kontroller2,kontroller3 plain
 ```
 
 </details>
 
 ---
 
-## [Operator](https://github.com/kubescape/operator)
+## [Kontroller](https://github.com/kubescape/kontroller)
 
 * __Resource Kind:__ `Deployment`
 * __Communication:__ REST API, Websocket
-* __Responsibility:__ The Operator component is at the heart of the solution as it is the triggering engine for the different actions in the cluster; It responds to REST API requests and messages received over websocket connection, and triggers the relevant action in the cluster. Such actions could be triggering a configuration scan, image vulnerability scan, defining a recurring scan (by creating CronJobs), etc.
+* __Responsibility:__ The Kontroller component is at the heart of the solution as it is the triggering engine for the different actions in the cluster; It responds to REST API requests and messages received over websocket connection, and triggers the relevant action in the cluster. Such actions could be triggering a configuration scan, image vulnerability scan, defining a recurring scan (by creating CronJobs), etc.
 
 <details><summary>Component Diagram</summary>
 
@@ -207,7 +208,7 @@ subgraph Cluster 1
 graph TB
   subgraph Cluster
     gw(Gateway)
-    operator(Operator)
+    kontroller(Kontroller)
     k8sApi(Kubernetes API);
     kubevuln(Kubevuln)
     ks(Kubescape)
@@ -216,14 +217,14 @@ graph TB
     recurringScanCj{{CronJob<br>Recurring Scan}}
   end;
    masterGw(Master Gateway) .- gw
-    gw ---> operator
-    recurringScanCj ---> operator
+    gw ---> kontroller
+    recurringScanCj ---> kontroller
     recurringScanCj --> recurringScanCj
-    operator -->|scan cluster| ks
-    operator -->|scan images| kubevuln
-    operator --> k8sApi
-    operator --- urlCm
-    operator --- recurringTempCm
+    kontroller -->|scan cluster| ks
+    kontroller -->|scan images| kubevuln
+    kontroller --> k8sApi
+    kontroller --- urlCm
+    kontroller --- recurringTempCm
   
   classDef k8s fill:#326ce5,stroke:#fff,stroke-width:1px,color:#fff;
   classDef plain fill:#ddd,stroke:#fff,stroke-width:1px,color:#000;
@@ -249,7 +250,7 @@ graph TB
 subgraph Cluster
     kubevuln(Kubevuln)  
     k8sApi(Kubernetes API)
-    operator(Operator)
+    kontroller(Kontroller)
     gateway(Gateway)
     urlCm{{ConfigMap<br>URLs}}
     recurringScanCj{{CronJob<br>Recurring Scan}}
@@ -259,14 +260,14 @@ subgraph Cluster
 end
 
 masterGateway  .- gateway
-gateway .-|Scan Notification| operator 
-operator -->|Collect NS, Images|k8sApi
-operator -->|Start Scan| kubevuln
-operator --- urlCm
+gateway .-|Scan Notification| kontroller 
+kontroller -->|Collect NS, Images|k8sApi
+kontroller -->|Start Scan| kubevuln
+kontroller --- urlCm
 urlCm --- kubevuln 
-recurringTempCm --- operator
+recurringTempCm --- kontroller
 recurringScanCj -->|Periodic Run| recurringScanCj
-recurringScanCj -->|Scan Notification| operator
+recurringScanCj -->|Scan Notification| kontroller
 recurringScanCm --- recurringScanCj
 
 subgraph Backend
@@ -279,7 +280,7 @@ classDef k8s fill:#326ce5,stroke:#fff,stroke-width:1px,color:#fff;
 classDef plain fill:#ddd,stroke:#fff,stroke-width:1px,color:#000
 
 class k8sApi k8s
-class urlCm,recurringScanCm,operator,er,gateway,masterGateway,recurringScanCj,recurringTempCm plain
+class urlCm,recurringScanCm,kontroller,er,gateway,masterGateway,recurringScanCj,recurringTempCm plain
 
 
 ```
@@ -287,11 +288,11 @@ class urlCm,recurringScanCm,operator,er,gateway,masterGateway,recurringScanCj,re
 
 ---
 
-## [Kubescape](https://github.com/kubescape/kubescape/tree/master/httphandler)
+## [Kubescape](https://github.com/armosec/kubescape/tree/master/httphandler)
 
 * __Resource Kind:__ `Deployment`
 * __Communication:__ REST API
-* __Responsibility:__ Runs [Kubescape](https://github.com/kubescape/kubescape) for detecting misconfigurations in the cluster; This is microservice uses the same engine as the Kubescape CLI tool.
+* __Responsibility:__ Runs [Kubescape](https://github.com/armosec/kubescape) for detecting misconfigurations in the cluster; This is microservice uses the same engine as the Kubescape CLI tool.
 
 <details><summary>Component Diagram</summary>
 
@@ -301,7 +302,7 @@ graph TB
 subgraph Cluster
     ks(Kubescape)  
     k8sApi(Kubernetes API)
-    operator(Operator)
+    kontroller(Kontroller)
     gateway(Gateway)
     ksCm{{ConfigMap<br>Kubescape}}
     recurringScanCj{{CronJob<br>Recurring Scan}}
@@ -310,13 +311,13 @@ subgraph Cluster
 end
 
 masterGateway  .- gateway
-gateway .-|Scan Notification| operator 
-operator -->|Start Scan| ks
+gateway .-|Scan Notification| kontroller 
+kontroller -->|Start Scan| ks
 ks-->|Collect Cluster Info|k8sApi
 ksCm --- ks 
-recurringTempCm --- operator
+recurringTempCm --- kontroller
 recurringScanCj -->|Periodic Run| recurringScanCj
-recurringScanCj -->|Scan Notification| operator
+recurringScanCj -->|Scan Notification| kontroller
 recurringScanCm --- recurringScanCj
 subgraph Backend
     er(EventReceiver)
@@ -328,7 +329,7 @@ classDef k8s fill:#326ce5,stroke:#fff,stroke-width:1px,color:#fff;
 classDef plain fill:#ddd,stroke:#fff,stroke-width:1px,color:#000
 
 class k8sApi k8s
-class ksCm,recurringScanCm,operator,er,gateway,masterGateway,recurringScanCj,recurringTempCm plain
+class ksCm,recurringScanCm,kontroller,er,gateway,masterGateway,recurringScanCj,recurringTempCm plain
 
 
 ```
@@ -372,11 +373,11 @@ class er,gw,masterGw plain
 
 ---
 
-## [URLs ConfigMap](https://github.com/kubescape/helm-charts/blob/master/charts/kubescape-cloud/templates/cloudapi-configmap.yaml)
+## [URLs ConfigMap](https://github.com/armosec/armo-helm/blob/master/charts/armo-components/templates/armo-configmap.yaml)
 
 Holds a list of communication URLs. Used by the following components:
 
-* Operator
+* Kontroller
 * Kubevuln
 * Gateway
 
@@ -405,7 +406,7 @@ Some in-cluster components communicate with the Kubernetes API server for differ
 
   Watches for changes in namespace, workloads, nodes. Reports information to the EventReceiver. Identifies image-related changes and triggers an image scanning on the new images accordingly (scanning new images functionality is optional).
 
-* Operator
+* Kontroller
 
   Creates/updates/deletes resources for recurring scan purposes (CronJobs, ConfigMaps). Collects required information (NS, image names/tags) for Kubevuln's image scanning.
 
@@ -448,9 +449,9 @@ An action which creates sub-action(s), will be created with a different `jobId` 
   2. Vulnerability scanning for container images (Kubevuln)
   3. Container registry scanning (Kubevuln)
 
-When creating a recurring scan, the Operator component will create a `ConfigMap` and a `CronJob` from a recurring template ConfigMap. Each scan type comes with a template.
+When creating a recurring scan, the Kontroller component will create a `ConfigMap` and a `CronJob` from a recurring template ConfigMap. Each scan type comes with a template.
 
-The CronJob itself does not run the scan directly. When a CronJob is ready to run, it will send a REST API request to the Operator component, which will then trigger the relevant scan (similarly to a request coming from the Gateway).
+The CronJob itself does not run the scan directly. When a CronJob is ready to run, it will send a REST API request to the Kontroller component, which will then trigger the relevant scan (similarly to a request coming from the Gateway).
 
 The scan results are then sent by each relevant component to the EventReceiver.
 
@@ -465,16 +466,16 @@ sequenceDiagram
     participant dashboard as Backend<br><br>Dashboard
     participant masterGw as Backend<br><br>Master Gateway
     participant clusterGw as Cluster<br><br>In-Cluster Gateway
-    participant operator as Cluster<br><br>Operator
+    participant kontroller as Cluster<br><br>Kontroller
     participant k8sApi as Cluster<br><br>Kubernetes API
     
     user->>dashboard: 1. create scan schedule
     dashboard->>masterGw: 2. build schedule notification
     masterGw->>clusterGw: 3. broadcast notification
-    clusterGw->>operator: 4. create recurring scan
-    operator->>k8sApi: 5. get namespaces, workloads
-    k8sApi-->>operator: 
-    operator->>k8sApi: 6. Create cronjob & ConfigMap
+    clusterGw->>kontroller: 4. create recurring scan
+    kontroller->>k8sApi: 5. get namespaces, workloads
+    k8sApi-->>kontroller: 
+    kontroller->>k8sApi: 6. Create cronjob & ConfigMap
 ```
 </details>
 
@@ -483,16 +484,16 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
    participant cronJob as Cluster<br><br>CronJob
-   participant operator as Cluster<br><br>Operator
+   participant kontroller as Cluster<br><br>Kontroller
    participant k8sApi as Cluster<br><br>Kubernetes API
    participant kubeVuln as Cluster<br><br>Kubevuln
    participant er as Backend<br><br>EventReceiver
    loop
-      cronJob->>operator: 1. run image scan
+      cronJob->>kontroller: 1. run image scan
    end
-   operator->>k8sApi: 2. list NS, container images
-   k8sApi-->>operator: 
-   operator->>kubeVuln: 3. scan images
+   kontroller->>k8sApi: 2. list NS, container images
+   k8sApi-->>kontroller: 
+   kontroller->>kubeVuln: 3. scan images
    kubeVuln ->> er: 4. send scan results
 ```
 
@@ -503,14 +504,14 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   participant cronJob as Cluster<br><br>CronJob
-  participant operator as Cluster<br><br>Operator
+  participant kontroller as Cluster<br><br>Kontroller
   participant ks as Cluster<br><br>Kubescape
   participant k8sApi as Cluster<br><br>Kubernetes API
   participant er as Backend<br><br>EventReceiver
   loop
-      cronJob->>operator: 1. run configuration scan
+      cronJob->>kontroller: 1. run configuration scan
   end
-  operator->>ks: 2. kubescape scan 
+  kontroller->>ks: 2. kubescape scan 
   ks->>k8sApi: 3. list NS, workloads, RBAC 
   k8sApi->>ks: 
   ks ->> er: 4. send scan results
