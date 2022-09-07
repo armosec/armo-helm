@@ -11,7 +11,7 @@ metadata:
   labels:
     app: {{ .Values.armoVulnScanScheduler.name }}
     tier: {{ .Values.global.namespaceTier}}
-    armo.tier: "kubescape-scan"
+    armo.tier: "vuln-scan"
 spec:
   schedule: "{{ .Values.armoVulnScanScheduler.scanSchedule }}"
   jobTemplate:
@@ -19,7 +19,7 @@ spec:
       template:
         metadata:
           labels:
-            armo.tier: "kubescape-scan"
+            armo.tier: "vuln-scan"
         spec:
           containers:
           - name: {{ .Values.armoVulnScanScheduler.name }}
