@@ -25,7 +25,9 @@ spec:
           - name: {{ .Values.armoKubescapeScanScheduler.name }}
             image: "{{ .Values.armoKubescapeScanScheduler.image.repository }}:{{ .Values.armoKubescapeScanScheduler.image.tag }}"
             imagePullPolicy: {{ .Values.armoKubescapeScanScheduler.image.pullPolicy }}
-            args: 
+            resources:
+{{ toYaml .Values.armoKubescapeScanScheduler.resources | indent 14 }}
+            args:
               - -method=post
               - -scheme=http
               - -host={{ .Values.armoWebsocket.name }}:{{ .Values.armoWebsocket.service.port }}

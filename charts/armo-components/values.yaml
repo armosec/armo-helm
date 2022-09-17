@@ -24,9 +24,9 @@ devBackendOpenAPI: "https://api-dev.armosec.io/api"
 # ARMO STAGING BE URLs
 stagingEventReceiverHttpUrl: "https://report-ks.eustage2.cyberarmorsoft.com"
 stagingK8sReportUrl: "wss://report.eustage2.cyberarmorsoft.com"
-stagingGateway: "ens.eustage2.cyberarmorsoft.com" 
+stagingGateway: "ens.eustage2.cyberarmorsoft.com"
 stagingBackendOpenAPI: "https://api-stage.armosec.io/api"
- 
+
 # Customer Specific Data
 # accountGuid is deliberately not defined here and it should be defined by the user
 # clusterName: "" // cluster name must be defined by the user
@@ -58,7 +58,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 # -- enable/disable trigger image scan for new images
-triggerNewImageScan: false  
+triggerNewImageScan: false
 
 # Additional volumes applied to all containers
 volumes: []
@@ -93,7 +93,7 @@ armoKubescapeScanScheduler:
            #     * * * * *
   # -- scan schedule frequency
   scanSchedule: "0 8 * * *"
-  
+
   image:
     # -- source code: https://github.com/armosec/http-request (public repo)
     repository: quay.io/armosec/http_request
@@ -107,6 +107,14 @@ armoKubescapeScanScheduler:
 
   # Additional volumeMounts to be mounted on the scan scheduler
   volumeMounts: []
+
+  resources:
+    requests:
+        cpu: 50m
+        memory: 100Mi
+    limits:
+        cpu: 300m
+        memory: 300Mi
 
 # kubescape scanner - https://github.com/armosec/kubescape
 armoKubescape:
@@ -136,7 +144,7 @@ armoKubescape:
   # -- download policies every scan, we recommend it should remain true, you should change to 'false' when running in an air-gapped environment or when scanning with high frequency (when running with Prometheus)
   downloadArtifacts: true
 
-  # -- skip check for a newer version 
+  # -- skip check for a newer version
   skipUpdateCheck: false
 
   # -- submit results to ARMO SaaS: https://cloud.armosec.io/
@@ -150,7 +158,7 @@ armoKubescape:
 
   # deploy a service monitor for prometheus (operator) integration
   serviceMonitor:
-    
+
     # -- enable/disable service monitor for prometheus (operator) integration
     enabled: false
 
@@ -223,7 +231,7 @@ armoVulnScanScheduler:
            #     │ │ │ │ │
            #     * * * * *
   scanSchedule: "0 0 * * *"
-  
+
   image:
     # source code - https://github.com/armosec/http-request
     repository: quay.io/armosec/http_request
@@ -238,10 +246,18 @@ armoVulnScanScheduler:
   # Additional volumeMounts to be mounted on the vuln scan scheduler
   volumeMounts: []
 
+  resources:
+    requests:
+        cpu: 50m
+        memory: 100Mi
+    limits:
+        cpu: 300m
+        memory: 300Mi
+
 # image vulnerability scanning microservice
 armoVulnScanner:
 
-  # -- for enable:"<any-value>", for disable:"": the print of json posted to the backend from the vuln scanner 
+  # -- for enable:"<any-value>", for disable:"": the print of json posted to the backend from the vuln scanner
   verbose: ""
 
   # -- enable/disable image vulnerability scanning
@@ -349,7 +365,7 @@ armoNotificationService:
     port: 8002
     targetPort: 8002
     protocol: TCP
-  
+
   image:
     # -- source code: https://github.com/kubescape/gateway
     repository: quay.io/kubescape/gateway
@@ -402,7 +418,7 @@ armoRegistryScanScheduler:
            #     * * * * *
   # -- scan schedule frequency
   scanSchedule: "0 0 * * *"
-  
+
   image:
     # -- source code: https://github.com/armosec/http-request (public repo)
     repository: quay.io/armosec/http_request
